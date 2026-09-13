@@ -24,6 +24,7 @@
       --text: #f5f8ff;
       --muted: #98a8bd;
       --green: #3ed598;
+      --red: #ff6577;
     }
 
     html {
@@ -39,9 +40,20 @@
       line-height: 1.6;
     }
 
+    body.modal-open {
+      overflow: hidden;
+    }
+
     a {
       color: inherit;
       text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
     }
 
     .container {
@@ -103,6 +115,7 @@
       font-size: 14px;
       transition: .2s ease;
       cursor: pointer;
+      color: white;
     }
 
     .btn-primary {
@@ -129,6 +142,7 @@
     .hero {
       padding: 105px 0 80px;
       text-align: center;
+      scroll-margin-top: 74px;
     }
 
     .badge {
@@ -217,6 +231,7 @@
 
     section {
       padding: 80px 0;
+      scroll-margin-top: 74px;
     }
 
     .section-head {
@@ -302,6 +317,10 @@
       color: #fff;
       font-size: 13px;
       font-weight: 800;
+    }
+
+    .discover:hover {
+      color: var(--blue-light);
     }
 
     /* ADVERTISING */
@@ -439,6 +458,138 @@
       color: white;
     }
 
+    /* MODALES */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(1,5,12,.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0b1525;
+      border: 1px solid rgba(88,181,255,.22);
+      border-radius: 20px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      padding: 30px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: rgba(255,255,255,.1);
+    }
+
+    .modal h2 {
+      font-size: 29px;
+      margin-bottom: 7px;
+      padding-right: 45px;
+    }
+
+    .modal-intro {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 17px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #dce7f5;
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #07101d;
+      color: white;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-control:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(22,140,255,.1);
+    }
+
+    .form-note {
+      color: #6f829b;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .form-message {
+      display: none;
+      margin-top: 16px;
+      padding: 13px 15px;
+      border-radius: 10px;
+      background: rgba(62,213,152,.08);
+      border: 1px solid rgba(62,213,152,.22);
+      color: #83ecc0;
+      font-size: 13px;
+    }
+
+    .form-message.show {
+      display: block;
+    }
+
+    .modal .btn {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .legal-check {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 12px 0 18px;
+    }
+
+    .legal-check input {
+      margin-top: 3px;
+    }
+
     /* RESPONSIVE */
 
     @media (max-width: 850px) {
@@ -477,6 +628,10 @@
       .ad-box {
         padding: 28px 20px;
       }
+
+      .modal {
+        padding: 25px 20px;
+      }
     }
   </style>
 </head>
@@ -486,24 +641,24 @@
 <header>
   <div class="container">
     <nav>
-      <a class="logo" href="#">Publi<span>nex</span></a>
+      <a class="logo" href="#accueil">Publi<span>nex</span></a>
 
       <div class="nav-links">
-        <a href="#">Accueil</a>
+        <a href="#accueil">Accueil</a>
         <a href="#decouvrir">Découvrir</a>
-        <a href="#">Ajouter mon site</a>
+        <a href="#" data-modal="add-site">Ajouter mon site</a>
         <a href="#publicite">Publicité</a>
-        <a href="#">Connexion</a>
+        <a href="#" data-modal="login">Connexion</a>
       </div>
 
-      <a href="#" class="btn btn-primary">Créer un compte</a>
+      <a href="#" class="btn btn-primary" data-modal="signup">Créer un compte</a>
     </nav>
   </div>
 </header>
 
 <main>
 
-  <section class="hero">
+  <section class="hero" id="accueil">
     <div class="container">
       <div class="badge">● Visibilité humaine • Contenus contrôlés</div>
 
@@ -520,7 +675,7 @@
 
       <div class="hero-buttons">
         <a href="#decouvrir" class="btn btn-primary">Découvrir des sites</a>
-        <a href="#" class="btn btn-secondary">Ajouter mon site</a>
+        <a href="#" class="btn btn-secondary" data-modal="add-site">Ajouter mon site</a>
       </div>
 
       <div class="trust-line">
@@ -562,7 +717,7 @@
           <p>Explorez les projets proposés par notre communauté.</p>
         </div>
 
-        <a href="#" class="btn btn-secondary">Voir tous les sites</a>
+        <a href="#decouvrir" class="btn btn-secondary">Voir tous les sites</a>
       </div>
 
       <div class="site-grid">
@@ -573,7 +728,7 @@
             <div class="category">Voyage</div>
             <h3>Découvertes & horizons</h3>
             <p>Blogs, expériences et idées autour du voyage.</p>
-            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+            <a class="discover" href="#" onclick="demoSite(event)">Découvrir →</a>
           </div>
         </article>
 
@@ -583,7 +738,7 @@
             <div class="category">Technologie</div>
             <h3>Web & numérique</h3>
             <p>Sites consacrés à la technologie et au numérique.</p>
-            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+            <a class="discover" href="#" onclick="demoSite(event)">Découvrir →</a>
           </div>
         </article>
 
@@ -593,7 +748,7 @@
             <div class="category">Création</div>
             <h3>Arts & passions</h3>
             <p>Découvrez les créations et passions des membres.</p>
-            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+            <a class="discover" href="#" onclick="demoSite(event)">Découvrir →</a>
           </div>
         </article>
 
@@ -603,7 +758,7 @@
             <div class="category">Loisirs</div>
             <h3>Maison & nature</h3>
             <p>Des sites personnels autour des loisirs et du quotidien.</p>
-            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+            <a class="discover" href="#" onclick="demoSite(event)">Découvrir →</a>
           </div>
         </article>
 
@@ -625,7 +780,7 @@
             publicitaires. Chaque campagne est contrôlée avant sa diffusion.
           </p>
 
-          <a href="#" class="btn btn-primary">Découvrir les offres</a>
+          <a href="#" class="btn btn-primary" data-modal="advertising">Ajouter une bannière</a>
         </div>
 
         <div class="price">
@@ -681,7 +836,7 @@
           Découvrez des projets, partagez vos passions et faites connaître votre site.
         </p>
 
-        <a href="#" class="btn btn-primary">Rejoindre Publinex</a>
+        <a href="#" class="btn btn-primary" data-modal="signup">Rejoindre Publinex</a>
       </div>
     </div>
   </section>
@@ -697,11 +852,11 @@
     </div>
 
     <div class="footer-links">
-      <a href="#">À propos</a>
-      <a href="#">CGU</a>
-      <a href="#">Confidentialité</a>
-      <a href="#">Mentions légales</a>
-      <a href="#">Contact</a>
+      <a href="#accueil">À propos</a>
+      <a href="#" onclick="legalInfo(event, 'CGU')">CGU</a>
+      <a href="#" onclick="legalInfo(event, 'Confidentialité')">Confidentialité</a>
+      <a href="#" onclick="legalInfo(event, 'Mentions légales')">Mentions légales</a>
+      <a href="#" onclick="legalInfo(event, 'Contact')">Contact</a>
     </div>
 
     <div>
@@ -710,6 +865,272 @@
 
   </div>
 </footer>
+
+
+<!-- MODALE CRÉER UN COMPTE -->
+
+<div class="modal-overlay" id="modal-signup">
+  <div class="modal">
+    <button class="modal-close" type="button" data-close>×</button>
+
+    <h2>Créer un compte</h2>
+    <p class="modal-intro">Rejoignez Publinex pour proposer et faire découvrir votre site.</p>
+
+    <form class="demo-form">
+      <div class="form-group">
+        <label>Pseudonyme</label>
+        <input class="form-control" type="text" required placeholder="Votre pseudonyme">
+      </div>
+
+      <div class="form-group">
+        <label>Adresse e-mail</label>
+        <input class="form-control" type="email" required placeholder="vous@exemple.fr">
+      </div>
+
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input class="form-control" type="password" required minlength="8" placeholder="8 caractères minimum">
+      </div>
+
+      <label class="legal-check">
+        <input type="checkbox" required>
+        <span>J'accepte les règles de Publinex et m'engage à proposer uniquement du contenu légal et conforme.</span>
+      </label>
+
+      <button class="btn btn-primary" type="submit">Créer mon compte</button>
+
+      <div class="form-message">
+        Le formulaire fonctionne. La création réelle du compte sera connectée à notre base de données à l'étape suivante.
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- MODALE CONNEXION -->
+
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <button class="modal-close" type="button" data-close>×</button>
+
+    <h2>Connexion</h2>
+    <p class="modal-intro">Accédez à votre espace membre Publinex.</p>
+
+    <form class="demo-form">
+      <div class="form-group">
+        <label>Adresse e-mail</label>
+        <input class="form-control" type="email" required placeholder="vous@exemple.fr">
+      </div>
+
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input class="form-control" type="password" required placeholder="Votre mot de passe">
+      </div>
+
+      <button class="btn btn-primary" type="submit">Me connecter</button>
+
+      <div class="form-message">
+        La fenêtre fonctionne. Nous connecterons ensuite l'authentification sécurisée.
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- MODALE AJOUTER UN SITE -->
+
+<div class="modal-overlay" id="modal-add-site">
+  <div class="modal">
+    <button class="modal-close" type="button" data-close>×</button>
+
+    <h2>Ajouter mon site</h2>
+    <p class="modal-intro">
+      Proposez votre site à Publinex. Il sera vérifié avant toute mise en ligne.
+    </p>
+
+    <form class="demo-form">
+      <div class="form-group">
+        <label>Nom du site</label>
+        <input class="form-control" type="text" required placeholder="Nom de votre site">
+      </div>
+
+      <div class="form-group">
+        <label>Adresse du site</label>
+        <input class="form-control" type="url" required placeholder="https://www.exemple.fr">
+      </div>
+
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select class="form-control" required>
+          <option value="">Choisir une catégorie</option>
+          <option>Art & création</option>
+          <option>Blog personnel</option>
+          <option>Maison & jardin</option>
+          <option>Mode & bijoux</option>
+          <option>Technologie</option>
+          <option>Voyage</option>
+          <option>Loisirs</option>
+          <option>Autre</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Courte présentation</label>
+        <textarea class="form-control" required maxlength="300" placeholder="Présentez votre site en quelques lignes."></textarea>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Envoyer pour validation</button>
+
+      <div class="form-message">
+        Formulaire prêt. Plus tard, les demandes arriveront automatiquement dans ton espace d'administration pour validation.
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- MODALE PUBLICITÉ -->
+
+<div class="modal-overlay" id="modal-advertising">
+  <div class="modal">
+    <button class="modal-close" type="button" data-close>×</button>
+
+    <h2>Ajouter une bannière</h2>
+    <p class="modal-intro">
+      Préparez votre campagne publicitaire. Toute bannière sera contrôlée avant diffusion.
+    </p>
+
+    <form class="demo-form">
+      <div class="form-group">
+        <label>Nom de l'annonceur ou du projet</label>
+        <input class="form-control" type="text" required placeholder="Votre nom ou votre projet">
+      </div>
+
+      <div class="form-group">
+        <label>Lien de destination</label>
+        <input class="form-control" type="url" required placeholder="https://www.exemple.fr">
+      </div>
+
+      <div class="form-group">
+        <label>Format de bannière</label>
+        <select class="form-control" required>
+          <option value="">Choisir un format</option>
+          <option>728 × 90 — Bannière horizontale</option>
+          <option>300 × 250 — Rectangle</option>
+          <option>320 × 100 — Mobile</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Durée souhaitée</label>
+        <select class="form-control" required>
+          <option value="">Choisir une durée</option>
+          <option>7 jours — 5 €</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Votre bannière</label>
+        <input class="form-control" type="file" accept="image/png,image/jpeg,image/webp" required>
+        <div class="form-note">PNG, JPG ou WEBP. La bannière sera vérifiée avant diffusion.</div>
+      </div>
+
+      <label class="legal-check">
+        <input type="checkbox" required>
+        <span>Je confirme que cette publicité respecte les règles de Publinex et ne contient aucun contenu interdit ou trompeur.</span>
+      </label>
+
+      <button class="btn btn-primary" type="submit">Continuer</button>
+
+      <div class="form-message">
+        Le parcours bannière fonctionne. Le paiement sécurisé et l'envoi automatique vers ton administration seront ajoutés ensuite.
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  const modalButtons = document.querySelectorAll("[data-modal]");
+  const overlays = document.querySelectorAll(".modal-overlay");
+  const closeButtons = document.querySelectorAll("[data-close]");
+
+  function openModal(name) {
+    const modal = document.getElementById("modal-" + name);
+
+    if (!modal) return;
+
+    modal.classList.add("active");
+    document.body.classList.add("modal-open");
+  }
+
+  function closeModal(modal) {
+    modal.classList.remove("active");
+
+    if (!document.querySelector(".modal-overlay.active")) {
+      document.body.classList.remove("modal-open");
+    }
+  }
+
+  modalButtons.forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      openModal(button.dataset.modal);
+    });
+  });
+
+  closeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      closeModal(button.closest(".modal-overlay"));
+    });
+  });
+
+  overlays.forEach(overlay => {
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) {
+        closeModal(overlay);
+      }
+    });
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      document.querySelectorAll(".modal-overlay.active").forEach(closeModal);
+    }
+  });
+
+  document.querySelectorAll(".demo-form").forEach(form => {
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const message = form.querySelector(".form-message");
+      message.classList.add("show");
+    });
+  });
+
+  function demoSite(event) {
+    event.preventDefault();
+
+    alert(
+      "Ici s'ouvrira le vrai site du membre dans un nouvel onglet. " +
+      "Les cartes visibles actuellement sont seulement nos exemples."
+    );
+  }
+
+  function legalInfo(event, pageName) {
+    event.preventDefault();
+
+    alert(
+      pageName +
+      " : cette page sera créée avant l'ouverture officielle de Publinex."
+    );
+  }
+</script>
 
 </body>
 </html>

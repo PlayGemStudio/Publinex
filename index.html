@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Publinex, plateforme de découverte et de visibilité entre utilisateurs réels.">
+  <title>Publinex — Faites découvrir votre site</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #050914;
+      --bg-soft: #09111f;
+      --card: #0d1728;
+      --card-light: #111e33;
+      --border: rgba(255,255,255,.09);
+      --blue: #168cff;
+      --blue-light: #58b5ff;
+      --text: #f5f8ff;
+      --muted: #98a8bd;
+      --green: #3ed598;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(22,140,255,.18), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1180px, 92%);
+      margin: auto;
+    }
+
+    /* HEADER */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5,9,20,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .logo {
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -.8px;
+    }
+
+    .logo span {
+      color: var(--blue);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 27px;
+      color: #cbd6e5;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 22px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-weight: 800;
+      font-size: 14px;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #087bf0, #20a5ff);
+      border: none;
+      box-shadow: 0 8px 30px rgba(22,140,255,.22);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 34px rgba(22,140,255,.35);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.04);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.08);
+    }
+
+    /* HERO */
+
+    .hero {
+      padding: 105px 0 80px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgba(88,181,255,.25);
+      border-radius: 30px;
+      background: rgba(22,140,255,.08);
+      color: var(--blue-light);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 25px;
+    }
+
+    .hero h1 {
+      max-width: 900px;
+      margin: auto;
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.03;
+      letter-spacing: -2.8px;
+    }
+
+    .hero h1 span {
+      color: var(--blue-light);
+    }
+
+    .hero p {
+      max-width: 690px;
+      margin: 25px auto 32px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .trust-line {
+      margin-top: 38px;
+      color: #718198;
+      font-size: 13px;
+    }
+
+    /* TRUST */
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding-bottom: 85px;
+    }
+
+    .trust-card {
+      background: linear-gradient(145deg, rgba(17,30,51,.9), rgba(8,16,29,.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      background: rgba(22,140,255,.12);
+      color: var(--blue-light);
+      font-size: 21px;
+    }
+
+    .trust-card h3 {
+      font-size: 17px;
+      margin-bottom: 7px;
+    }
+
+    .trust-card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* SECTIONS */
+
+    section {
+      padding: 80px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .section-head h2 {
+      font-size: 34px;
+      letter-spacing: -1px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* SITES */
+
+    .sites {
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.012);
+    }
+
+    .site-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .site-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: .2s ease;
+    }
+
+    .site-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(88,181,255,.35);
+    }
+
+    .site-preview {
+      height: 145px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(32,165,255,.35), transparent 30%),
+        linear-gradient(135deg, #122b4b, #09111e);
+      font-size: 38px;
+    }
+
+    .site-content {
+      padding: 20px;
+    }
+
+    .category {
+      color: var(--blue-light);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .site-content h3 {
+      margin: 7px 0;
+      font-size: 17px;
+    }
+
+    .site-content p {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 42px;
+    }
+
+    .discover {
+      display: inline-block;
+      margin-top: 15px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    /* ADVERTISING */
+
+    .advertising {
+      background:
+        radial-gradient(circle at 90% 50%, rgba(22,140,255,.13), transparent 30%),
+        var(--bg-soft);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ad-box {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 35px;
+      align-items: center;
+      padding: 45px;
+      border: 1px solid rgba(88,181,255,.18);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(18,40,69,.8), rgba(8,16,29,.9));
+    }
+
+    .ad-box h2 {
+      font-size: 36px;
+      line-height: 1.15;
+      margin-bottom: 15px;
+    }
+
+    .ad-box p {
+      color: var(--muted);
+      max-width: 650px;
+      margin-bottom: 24px;
+    }
+
+    .price {
+      text-align: center;
+      padding: 30px;
+      border-radius: 18px;
+      background: rgba(4,9,18,.65);
+      border: 1px solid var(--border);
+    }
+
+    .price small {
+      color: var(--muted);
+    }
+
+    .price strong {
+      display: block;
+      font-size: 46px;
+      margin: 5px 0;
+    }
+
+    .price span {
+      color: var(--blue-light);
+      font-weight: 800;
+    }
+
+    /* HOW */
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .step {
+      padding: 28px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+
+    .number {
+      color: var(--blue-light);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 7px;
+    }
+
+    /* CTA */
+
+    .cta {
+      text-align: center;
+      padding: 90px 0;
+    }
+
+    .cta-box {
+      padding: 60px 25px;
+      border-radius: 24px;
+      border: 1px solid rgba(88,181,255,.18);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(22,140,255,.2), transparent 50%),
+        var(--card);
+    }
+
+    .cta h2 {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      margin-bottom: 25px;
+    }
+
+    /* FOOTER */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 35px 0;
+      color: #74849a;
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 850px) {
+      .nav-links {
+        display: none;
+      }
+
+      .trust-grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .site-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .ad-box {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero {
+        padding-top: 75px;
+      }
+
+      .site-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .ad-box {
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <a class="logo" href="#">Publi<span>nex</span></a>
+
+      <div class="nav-links">
+        <a href="#">Accueil</a>
+        <a href="#decouvrir">Découvrir</a>
+        <a href="#">Ajouter mon site</a>
+        <a href="#publicite">Publicité</a>
+        <a href="#">Connexion</a>
+      </div>
+
+      <a href="#" class="btn btn-primary">Créer un compte</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <div class="badge">● Visibilité humaine • Contenus contrôlés</div>
+
+      <h1>
+        Faites découvrir votre site à de
+        <span>vraies personnes.</span>
+      </h1>
+
+      <p>
+        Publinex est une plateforme de découverte et de visibilité
+        permettant aux créateurs de sites et de blogs de faire connaître
+        leurs projets auprès d'une communauté réelle.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#decouvrir" class="btn btn-primary">Découvrir des sites</a>
+        <a href="#" class="btn btn-secondary">Ajouter mon site</a>
+      </div>
+
+      <div class="trust-line">
+        Aucun robot • Aucun gain d'argent • Aucune promesse de référencement Google
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="trust-grid">
+
+      <div class="trust-card">
+        <div class="icon">👥</div>
+        <h3>De vraies personnes</h3>
+        <p>Les visites proviennent des utilisateurs qui découvrent librement les sites présents sur Publinex.</p>
+      </div>
+
+      <div class="trust-card">
+        <div class="icon">✓</div>
+        <h3>Contenus vérifiés</h3>
+        <p>Les sites proposés sont soumis à une validation afin de maintenir une plateforme propre et sérieuse.</p>
+      </div>
+
+      <div class="trust-card">
+        <div class="icon">🛡</div>
+        <h3>Une plateforme de confiance</h3>
+        <p>Les abus, contenus frauduleux, adultes, haineux ou illégaux ne sont pas acceptés.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="sites" id="decouvrir">
+    <div class="container">
+
+      <div class="section-head">
+        <div>
+          <h2>Sites à découvrir</h2>
+          <p>Explorez les projets proposés par notre communauté.</p>
+        </div>
+
+        <a href="#" class="btn btn-secondary">Voir tous les sites</a>
+      </div>
+
+      <div class="site-grid">
+
+        <article class="site-card">
+          <div class="site-preview">🌍</div>
+          <div class="site-content">
+            <div class="category">Voyage</div>
+            <h3>Découvertes & horizons</h3>
+            <p>Blogs, expériences et idées autour du voyage.</p>
+            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+          </div>
+        </article>
+
+        <article class="site-card">
+          <div class="site-preview">💻</div>
+          <div class="site-content">
+            <div class="category">Technologie</div>
+            <h3>Web & numérique</h3>
+            <p>Sites consacrés à la technologie et au numérique.</p>
+            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+          </div>
+        </article>
+
+        <article class="site-card">
+          <div class="site-preview">🎨</div>
+          <div class="site-content">
+            <div class="category">Création</div>
+            <h3>Arts & passions</h3>
+            <p>Découvrez les créations et passions des membres.</p>
+            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+          </div>
+        </article>
+
+        <article class="site-card">
+          <div class="site-preview">🌿</div>
+          <div class="site-content">
+            <div class="category">Loisirs</div>
+            <h3>Maison & nature</h3>
+            <p>Des sites personnels autour des loisirs et du quotidien.</p>
+            <a class="discover" href="#" target="_blank" rel="noopener noreferrer">Découvrir →</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="advertising" id="publicite">
+    <div class="container">
+
+      <div class="ad-box">
+        <div>
+          <div class="badge">ESPACE ANNONCEURS</div>
+
+          <h2>Donnez davantage de visibilité à votre projet.</h2>
+
+          <p>
+            Publiez votre bannière sur Publinex grâce à nos emplacements
+            publicitaires. Chaque campagne est contrôlée avant sa diffusion.
+          </p>
+
+          <a href="#" class="btn btn-primary">Découvrir les offres</a>
+        </div>
+
+        <div class="price">
+          <small>Offre de lancement envisagée</small>
+          <strong>5 €</strong>
+          <span>7 jours de visibilité</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+
+      <div class="section-head">
+        <div>
+          <h2>Comment fonctionne Publinex ?</h2>
+          <p>Un fonctionnement volontairement simple et transparent.</p>
+        </div>
+      </div>
+
+      <div class="steps">
+
+        <div class="step">
+          <div class="number">01</div>
+          <h3>Créez votre compte</h3>
+          <p>Rejoignez Publinex et complétez votre espace membre.</p>
+        </div>
+
+        <div class="step">
+          <div class="number">02</div>
+          <h3>Proposez votre site</h3>
+          <p>Votre site est vérifié avant d'être rendu visible sur la plateforme.</p>
+        </div>
+
+        <div class="step">
+          <div class="number">03</div>
+          <h3>Faites-vous découvrir</h3>
+          <p>Votre projet devient accessible aux personnes qui parcourent Publinex.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Une visibilité plus humaine.</h2>
+
+        <p>
+          Découvrez des projets, partagez vos passions et faites connaître votre site.
+        </p>
+
+        <a href="#" class="btn btn-primary">Rejoindre Publinex</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container footer-inner">
+
+    <div>
+      <strong style="color:white;">Publinex</strong><br>
+      Plateforme de découverte et de visibilité.
+    </div>
+
+    <div class="footer-links">
+      <a href="#">À propos</a>
+      <a href="#">CGU</a>
+      <a href="#">Confidentialité</a>
+      <a href="#">Mentions légales</a>
+      <a href="#">Contact</a>
+    </div>
+
+    <div>
+      © 2026 Publinex
+    </div>
+
+  </div>
+</footer>
+
+</body>
+</html>

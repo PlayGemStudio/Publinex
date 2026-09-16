@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeux | Publinex</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #050914;
+      --bg-soft: #09111f;
+      --card: #0d1728;
+      --card-light: #111e33;
+      --border: rgba(255,255,255,.09);
+      --blue: #168cff;
+      --blue-light: #58b5ff;
+      --text: #f5f8ff;
+      --muted: #9ba8bd;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(22,140,255,.13), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1296px, calc(100% - 40px));
+      margin: auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(5,9,20,.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+
+    nav {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .logo {
+      font-size: 31px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+    }
+
+    .logo span {
+      color: var(--blue);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      font-weight: 700;
+    }
+
+    .nav-links a {
+      color: #d9e1ee;
+      transition: .2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links .active {
+      color: var(--blue-light);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 25px;
+      border-radius: 11px;
+      font-weight: 800;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #168cff, #27b2ff);
+      box-shadow: 0 10px 30px rgba(22,140,255,.18);
+    }
+
+    .hero {
+      padding: 90px 0 55px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 10px 17px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(88,181,255,.35);
+      border-radius: 999px;
+      background: rgba(22,140,255,.08);
+      color: var(--blue-light);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: auto;
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 1.02;
+      letter-spacing: -3px;
+    }
+
+    h1 span {
+      color: var(--blue-light);
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 25px auto 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .games {
+      padding: 35px 0 100px;
+    }
+
+    .section-head {
+      margin-bottom: 28px;
+    }
+
+    .section-head h2 {
+      font-size: 34px;
+      margin-bottom: 9px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .game-card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      transition: transform .25s, border-color .25s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(88,181,255,.4);
+    }
+
+    .game-visual {
+      height: 205px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle, rgba(22,140,255,.28), transparent 45%),
+        linear-gradient(135deg, #102542, #07101e);
+      font-size: 65px;
+    }
+
+    .game-info {
+      padding: 24px;
+    }
+
+    .game-info small {
+      color: var(--blue-light);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .game-info h3 {
+      margin: 10px 0;
+      font-size: 22px;
+    }
+
+    .game-info p {
+      min-height: 48px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .coming {
+      display: inline-block;
+      margin-top: 19px;
+      padding: 9px 13px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.06);
+      color: #b9c5d7;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .member-box {
+      margin-top: 55px;
+      padding: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      border: 1px solid rgba(88,181,255,.25);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(22,140,255,.12), rgba(13,23,40,.9));
+    }
+
+    .member-box h2 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .member-box p {
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 35px 0;
+      color: var(--muted);
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        gap: 16px;
+        font-size: 14px;
+      }
+
+      .game-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .member-box {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 650px) {
+      nav {
+        padding: 18px 0;
+        flex-wrap: wrap;
+      }
+
+      .nav-links {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <a class="logo" href="index.html">Publi<span>nex</span></a>
+
+      <div class="nav-links">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#decouvrir">Découvrir</a>
+        <a class="active" href="jeux.html">Jeux</a>
+        <a href="index.html#publier">Ajouter mon site</a>
+        <a href="index.html">Connexion</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <div class="badge">ESPACE JEUX PUBLINEX</div>
+
+      <h1>
+        Une sélection de jeux pour
+        <span>profiter de Publinex.</span>
+      </h1>
+
+      <p>
+        L'accès aux jeux est inclus pendant les 30 jours de publication
+        de votre site ou de votre blog sur Publinex.
+      </p>
+    </div>
+  </section>
+
+  <section class="games">
+    <div class="container">
+
+      <div class="section-head">
+        <h2>Les jeux Publinex</h2>
+        <p>Nous allons intégrer ici des jeux jouables directement dans votre navigateur.</p>
+      </div>
+
+      <div class="game-grid">
+
+        <article class="game-card">
+          <div class="game-visual">🔵</div>
+          <div class="game-info">
+            <small>Arcade</small>
+            <h3>Bubble Shooter</h3>
+            <p>Visez, combinez les couleurs et réalisez les meilleurs enchaînements.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-visual">🧱</div>
+          <div class="game-info">
+            <small>Arcade</small>
+            <h3>Brick Breaker</h3>
+            <p>Détruisez les briques, récupérez les bonus et progressez dans les niveaux.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-visual">💎</div>
+          <div class="game-info">
+            <small>Réflexion</small>
+            <h3>Crystal 2048</h3>
+            <p>Combinez les cristaux et tentez d'atteindre le meilleur score.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-visual">🃏</div>
+          <div class="game-info">
+            <small>Cartes</small>
+            <h3>Solitaire</h3>
+            <p>Une version claire et moderne du grand classique des jeux de cartes.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-visual">🧩</div>
+          <div class="game-info">
+            <small>Réflexion</small>
+            <h3>Block Puzzle</h3>
+            <p>Placez intelligemment les blocs pour compléter les lignes et marquer des points.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-visual">🎯</div>
+          <div class="game-info">
+            <small>Adresse</small>
+            <h3>Darts</h3>
+            <p>Travaillez votre précision et tentez de battre votre meilleur score.</p>
+            <span class="coming">Bientôt disponible</span>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="member-box">
+        <div>
+          <h2>Accès inclus avec votre publication</h2>
+          <p>
+            Publiez votre site ou votre blog sur Publinex pour 5 € pendant 30 jours.
+            Pendant cette période, votre accès aux jeux Publinex est inclus.
+          </p>
+        </div>
+
+        <a class="btn btn-primary" href="index.html#publier">
+          Publier mon site ou mon blog
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container footer-row">
+    <strong>Publinex</strong>
+    <span>© 2026 Publinex</span>
+  </div>
+</footer>
+
+</body>
+</html>

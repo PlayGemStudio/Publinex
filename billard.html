@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Publinex Pool</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  background:
+    radial-gradient(circle at 50% 0%,#12365c 0,#071526 34%,#030914 78%);
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.game-shell{
+  width:min(1500px,100%);
+  margin:auto;
+  padding:18px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:14px;
+}
+.brand{
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+.brand span{color:#39a9ff}
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button{
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  padding:11px 16px;
+  background:linear-gradient(#18304d,#0c1d32);
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 5px 16px rgba(0,0,0,.25);
+}
+button:hover{filter:brightness(1.15)}
+button.primary{
+  background:linear-gradient(135deg,#1599ff,#0068d8);
+}
+.hud{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+.player{
+  background:rgba(8,22,40,.86);
+  border:1px solid rgba(92,174,255,.22);
+  border-radius:14px;
+  padding:12px 16px;
+  min-height:63px;
+  box-shadow:inset 0 1px rgba(255,255,255,.04);
+}
+.player.right{text-align:right}
+.player.active{
+  border-color:#45b5ff;
+  box-shadow:0 0 20px rgba(39,159,255,.18),inset 0 1px rgba(255,255,255,.06);
+}
+.player strong{font-size:17px}
+.player small{
+  display:block;
+  color:#8fa9c5;
+  margin-top:5px;
+}
+.center-status{
+  text-align:center;
+  min-width:230px;
+}
+.center-status .turn{
+  color:#56bdff;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:1.5px;
+}
+#status{
+  margin-top:4px;
+  font-size:15px;
+  font-weight:800;
+}
+.table-wrap{
+  position:relative;
+  width:100%;
+  border-radius:28px;
+  padding:10px;
+  background:linear-gradient(145deg,#06101c,#162a40);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.55),
+    0 0 0 1px rgba(80,170,255,.14);
+}
+canvas{
+  display:block;
+  width:100%;
+  aspect-ratio:2/1;
+  border-radius:20px;
+  touch-action:none;
+  cursor:crosshair;
+}
+.bottom-panel{
+  display:grid;
+  grid-template-columns:1fr minmax(260px,520px) 1fr;
+  align-items:center;
+  gap:18px;
+  margin-top:15px;
+  padding:14px 18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(5,16,29,.8);
+}
+.help{
+  color:#93aac3;
+  font-size:13px;
+  line-height:1.45;
+}
+.power-zone{text-align:center}
+.power-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:800;
+  color:#9fb5cc;
+  margin-bottom:7px;
+}
+.power-track{
+  height:16px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#06111f;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 2px 6px #000;
+}
+#powerFill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#27b7ff 0%,#24d98d 55%,#ffd84c 78%,#ff5353 100%);
+  box-shadow:0 0 12px rgba(44,176,255,.6);
+  transition:width .035s linear;
+}
+.sound-state{
+  text-align:right;
+  color:#93aac3;
+  font-size:13px;
+}
+@media(max-width:800px){
+  .game-shell{padding:8px}
+  .hud{grid-template-columns:1fr 1fr}
+  .center-status{grid-column:1/-1;grid-row:2}
+  .bottom-panel{grid-template-columns:1fr}
+  .sound-state{text-align:center}
+  .help{text-align:center}
+  button{padding:9px 11px}
+}
+</style>
+</head>
+
+<body>
+<div class="game-shell">
+
+  <div class="topbar">
+    <div class="brand">Publi<span>nex</span> Pool</div>
+    <div class="controls">
+      <button id="soundBtn">🔊 Son activé</button>
+      <button id="newBtn" class="primary">Nouvelle partie</button>
+      <button onclick="location.href='jeux.html'">Retour aux jeux</button>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div id="p1" class="player active">
+      <strong>JOUEUR 1</strong>
+      <small id="p1info">À déterminer</small>
+    </div>
+
+    <div class="center-status">
+      <div class="turn">PUBLINEX 8-BALL</div>
+      <div id="status">À toi de casser !</div>
+    </div>
+
+    <div id="p2" class="player right">
+      <strong>JOUEUR 2</strong>
+      <small id="p2info">À déterminer</small>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <canvas id="game"></canvas>
+  </div>
+
+  <div class="bottom-panel">
+    <div class="help">
+      <strong>Comment jouer</strong><br>
+      Déplace la souris pour viser. Maintiens le bouton gauche,
+      tire vers l'arrière puis relâche pour frapper.
+    </div>
+
+    <div class="power-zone">
+      <div class="power-label">
+        <span>PUISSANCE</span>
+        <span id="powerText">0 %</span>
+      </div>
+      <div class="power-track"><div id="powerFill"></div></div>
+    </div>
+
+    <div id="soundState" class="sound-state">
+      Sons physiques activés
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d",{alpha:false});
+
+const statusEl = document.getElementById("status");
+const powerFill = document.getElementById("powerFill");
+const powerText = document.getElementById("powerText");
+const p1El = document.getElementById("p1");
+const p2El = document.getElementById("p2");
+const p1Info = document.getElementById("p1info");
+const p2Info = document.getElementById("p2info");
+const soundBtn = document.getElementById("soundBtn");
+const soundState = document.getElementById("soundState");
+
+const WORLD_W = 1400;
+const WORLD_H = 700;
+
+const TABLE = {
+  left:118,
+  right:1282,
+  top:92,
+  bottom:608,
+  cushion:34,
+  pocketR:34
+};
+
+const BALL_R = 15;
+const FRICTION = 0.991;
+const STOP_SPEED = 0.055;
+const CUSHION_BOUNCE = 0.88;
+const BALL_RESTITUTION = 0.96;
+const MAX_SHOT = 28;
+
+let balls=[];
+let mouse={x:360,y:350};
+let dragging=false;
+let dragStart=null;
+let power=0;
+let currentPlayer=1;
+let playerTypes={1:null,2:null};
+let shotInProgress=false;
+let pocketedThisShot=[];
+let cuePocketed=false;
+let gameOver=false;
+let lastTime=performance.now();
+let accumulator=0;
+const STEP=1/120;
+
+let audioCtx=null;
+let soundEnabled=true;
+let lastCollisionSound=0;
+
+function initAudio(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}
+
+function tone(freq,duration,volume,type="sine",delay=0){
+  if(!soundEnabled || !audioCtx) return;
+
+  const now=audioCtx.currentTime+delay;
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,now);
+
+  gain.gain.setValueAtTime(0.0001,now);
+  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,volume),now+.004);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+  osc.stop(now+duration+.02);
+}
+
+function hitSound(intensity){
+  if(!soundEnabled || !audioCtx) return;
+
+  const now=performance.now();
+  if(now-lastCollisionSound<18) return;
+  lastCollisionSound=now;
+
+  const v=Math.min(.11,.025+intensity*.004);
+  tone(145+Math.random()*35,.055,v,"triangle");
+  tone(82,.04,v*.45,"sine",.003);
+}
+
+function railSound(intensity){
+  if(!soundEnabled || !audioCtx) return;
+  const v=Math.min(.075,.018+intensity*.003);
+  tone(105,.05,v,"triangle");
+}
+
+function pocketSound(){
+  if(!soundEnabled || !audioCtx) return;
+  tone(180,.11,.09,"sine");
+  tone(110,.18,.07,"sine",.035);
+  tone(72,.22,.055,"triangle",.07);
+}
+
+function cueSound(power){
+  if(!soundEnabled || !audioCtx) return;
+  const v=.055+power/MAX_SHOT*.09;
+  tone(230,.045,v,"triangle");
+  tone(120,.055,v*.55,"sine",.008);
+}
+
+soundBtn.addEventListener("click",()=>{
+  initAudio();
+  soundEnabled=!soundEnabled;
+  soundBtn.textContent=soundEnabled ? "🔊 Son activé" : "🔇 Son coupé";
+  soundState.textContent=soundEnabled ? "Sons physiques activés" : "Son désactivé";
+});
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.width*.5*dpr);
+
+  ctx.setTransform(
+    canvas.width/WORLD_W,
+    0,
+    0,
+    canvas.height/WORLD_H,
+    0,
+    0
+  );
+}
+
+window.addEventListener("resize",resizeCanvas);
+
+class Ball{
+  constructor(number,x,y){
+    this.number=number;
+    this.x=x;
+    this.y=y;
+    this.vx=0;
+    this.vy=0;
+    this.pocketed=false;
+    this.spin=0;
+  }
+
+  get speed(){
+    return Math.hypot(this.vx,this.vy);
+  }
+
+  update(dt){
+    if(this.pocketed)return;
+
+    this.x+=this.vx*dt*120;
+    this.y+=this.vy*dt*120;
+
+    const damping=Math.pow(FRICTION,dt*120);
+    this.vx*=damping;
+    this.vy*=damping;
+
+    if(Math.abs(this.vx)<STOP_SPEED)this.vx=0;
+    if(Math.abs(this.vy)<STOP_SPEED)this.vy=0;
+
+    this.spin+=this.speed*.006;
+  }
+}
+
+const COLORS={
+  1:"#f5d21f",
+  2:"#2367d8",
+  3:"#e83335",
+  4:"#7734b5",
+  5:"#e77b19",
+  6:"#1c9b59",
+  7:"#7c1823",
+  8:"#111318",
+  9:"#f5d21f",
+  10:"#2367d8",
+  11:"#e83335",
+  12:"#7734b5",
+  13:"#e77b19",
+  14:"#1c9b59",
+  15:"#7c1823"
+};
+
+function setupGame(){
+  balls=[];
+  currentPlayer=1;
+  playerTypes={1:null,2:null};
+  shotInProgress=false;
+  pocketedThisShot=[];
+  cuePocketed=false;
+  gameOver=false;
+  dragging=false;
+  power=0;
+
+  balls.push(new Ball(0,390,350));
+
+  const rackX=965;
+  const rackY=350;
+  const dx=BALL_R*1.78;
+  const dy=BALL_R*2.05;
+
+  let layout=[
+    [1],
+    [9,2],
+    [3,8,10],
+    [11,4,12,5],
+    [6,13,7,14,15]
+  ];
+
+  layout.forEach((row,col)=>{
+    row.forEach((num,i)=>{
+      const x=rackX+col*dx;
+      const y=rackY+(i-(row.length-1)/2)*dy;
+      balls.push(new Ball(num,x,y));
+    });
+  });
+
+  updateHUD();
+  statusEl.textContent="À toi de casser !";
+}
+
+function getCueBall(){
+  return balls.find(b=>b.number===0);
+}
+
+function allStopped(){
+  return balls.every(b=>b.pocketed || b.speed<STOP_SPEED);
+}
+
+function pockets(){
+  return [
+    {x:TABLE.left,y:TABLE.top},
+    {x:(TABLE.left+TABLE.right)/2,y:TABLE.top-3},
+    {x:TABLE.right,y:TABLE.top},
+    {x:TABLE.left,y:TABLE.bottom},
+    {x:(TABLE.left+TABLE.right)/2,y:TABLE.bottom+3},
+    {x:TABLE.right,y:TABLE.bottom}
+  ];
+}
+
+function physics(dt){
+  balls.forEach(b=>b.update(dt));
+
+  for(let i=0;i<balls.length;i++){
+    const a=balls[i];
+    if(a.pocketed)continue;
+
+    checkPocket(a);
+    if(a.pocketed)continue;
+
+    cushionCollision(a);
+
+    for(let j=i+1;j<balls.length;j++){
+      const b=balls[j];
+      if(!b.pocketed)ballCollision(a,b);
+    }
+  }
+}
+
+function checkPocket(b){
+  for(const p of pockets()){
+    const d=Math.hypot(b.x-p.x,b.y-p.y);
+
+    if(d<TABLE.pocketR){
+      b.pocketed=true;
+      b.vx=0;
+      b.vy=0;
+
+      pocketSound();
+
+      if(b.number===0){
+        cuePocketed=true;
+      }else{
+        pocketedThisShot.push(b.number);
+      }
+      return;
+    }
+  }
+}
+
+function cushionCollision(b){
+  let bounced=false;
+  let impact=0;
+
+  if(b.x-BALL_R<TABLE.left){
+    impact=Math.abs(b.vx);
+    b.x=TABLE.left+BALL_R;
+    b.vx=Math.abs(b.vx)*CUSHION_BOUNCE;
+    bounced=true;
+  }
+
+  if(b.x+BALL_R>TABLE.right){
+    impact=Math.max(impact,Math.abs(b.vx));
+    b.x=TABLE.right-BALL_R;
+    b.vx=-Math.abs(b.vx)*CUSHION_BOUNCE;
+    bounced=true;
+  }
+
+  if(b.y-BALL_R<TABLE.top){
+    impact=Math.max(impact,Math.abs(b.vy));
+    b.y=TABLE.top+BALL_R;
+    b.vy=Math.abs(b.vy)*CUSHION_BOUNCE;
+    bounced=true;
+  }
+
+  if(b.y+BALL_R>TABLE.bottom){
+    impact=Math.max(impact,Math.abs(b.vy));
+    b.y=TABLE.bottom-BALL_R;
+    b.vy=-Math.abs(b.vy)*CUSHION_BOUNCE;
+    bounced=true;
+  }
+
+  if(bounced && impact>1.2)railSound(impact);
+}
+
+function ballCollision(a,b){
+  let dx=b.x-a.x;
+  let dy=b.y-a.y;
+  let dist=Math.hypot(dx,dy);
+  const minDist=BALL_R*2;
+
+  if(dist===0){
+    dx=.01;
+    dy=0;
+    dist=.01;
+  }
+
+  if(dist>=minDist)return;
+
+  const nx=dx/dist;
+  const ny=dy/dist;
+
+  const overlap=minDist-dist;
+  a.x-=nx*overlap*.5;
+  a.y-=ny*overlap*.5;
+  b.x+=nx*overlap*.5;
+  b.y+=ny*overlap*.5;
+
+  const rvx=b.vx-a.vx;
+  const rvy=b.vy-a.vy;
+  const velAlongNormal=rvx*nx+rvy*ny;
+
+  if(velAlongNormal>0)return;
+
+  const impulse=-(1+BALL_RESTITUTION)*velAlongNormal/2;
+  const ix=impulse*nx;
+  const iy=impulse*ny;
+
+  a.vx-=ix;
+  a.vy-=iy;
+  b.vx+=ix;
+  b.vy+=iy;
+
+  if(Math.abs(velAlongNormal)>1)hitSound(Math.abs(velAlongNormal));
+}
+
+function updateGameState(){
+  if(!shotInProgress || !allStopped())return;
+
+  shotInProgress=false;
+
+  if(cuePocketed){
+    respawnCue();
+    switchPlayer();
+    statusEl.textContent="Faute : bille blanche empochée";
+    cuePocketed=false;
+    pocketedThisShot=[];
+    return;
+  }
+
+  const eight=pocketedThisShot.includes(8);
+
+  if(eight){
+    const type=playerTypes[currentPlayer];
+
+    if(type && remainingFor(type)===0){
+      statusEl.textContent=`Joueur ${currentPlayer} gagne !`;
+    }else{
+      const winner=currentPlayer===1?2:1;
+      statusEl.textContent=`Joueur ${winner} gagne ! Bille 8 trop tôt.`;
+    }
+
+    gameOver=true;
+    pocketedThisShot=[];
+    return;
+  }
+
+  const legalBalls=pocketedThisShot.filter(n=>n!==8);
+
+  if(!playerTypes[1] && legalBalls.length){
+    const first=legalBalls[0];
+    const type=first<=7 ? "pleines" : "rayées";
+
+    playerTypes[currentPlayer]=type;
+    playerTypes[currentPlayer===1?2:1]=type==="pleines" ? "rayées" : "pleines";
+  }
+
+  let keepTurn=false;
+
+  if(legalBalls.length){
+    const type=playerTypes[currentPlayer];
+
+    keepTurn=legalBalls.some(n=>
+      type==="pleines" ? n>=1&&n<=7 : n>=9&&n<=15
+    );
+  }
+
+  if(!keepTurn)switchPlayer();
+  else statusEl.textContent=`Joueur ${currentPlayer} rejoue`;
+
+  pocketedThisShot=[];
+  updateHUD();
+}
+
+function remainingFor(type){
+  return balls.filter(b=>{
+    if(b.pocketed)return false;
+    if(type==="pleines")return b.number>=1&&b.number<=7;
+    return b.number>=9&&b.number<=15;
+  }).length;
+}
+
+function switchPlayer(){
+  currentPlayer=currentPlayer===1?2:1;
+  statusEl.textContent=`Au joueur ${currentPlayer}`;
+  updateHUD();
+}
+
+function respawnCue(){
+  const cue=getCueBall();
+  cue.pocketed=false;
+  cue.x=390;
+  cue.y=350;
+  cue.vx=0;
+  cue.vy=0;
+
+  for(let tries=0;tries<50;tries++){
+    const collision=balls.some(b=>
+      b!==cue && !b.pocketed &&
+      Math.hypot(b.x-cue.x,b.y-cue.y)<BALL_R*2.2
+    );
+
+    if(!collision)break;
+    cue.x-=8;
+  }
+}
+
+function updateHUD(){
+  p1El.classList.toggle("active",currentPlayer===1);
+  p2El.classList.toggle("active",currentPlayer===2);
+
+  p1Info.textContent=playerTypes[1]
+    ? `${playerTypes[1]} • ${remainingFor(playerTypes[1])} restantes`
+    : "À déterminer";
+
+  p2Info.textContent=playerTypes[2]
+    ? `${playerTypes[2]} • ${remainingFor(playerTypes[2])} restantes`
+    : "À déterminer";
+}
+
+function pointerPos(e){
+  const r=canvas.getBoundingClientRect();
+  const touch=e.touches ? e.touches[0] : e;
+
+  return {
+    x:(touch.clientX-r.left)/r.width*WORLD_W,
+    y:(touch.clientY-r.top)/r.height*WORLD_H
+  };
+}
+
+canvas.addEventListener("pointermove",e=>{
+  mouse=pointerPos(e);
+
+  if(dragging && dragStart){
+    const d=Math.hypot(mouse.x-dragStart.x,mouse.y-dragStart.y);
+    power=Math.min(100,d/3.2);
+    updatePower();
+  }
+});
+
+canvas.addEventListener("pointerdown",e=>{
+  initAudio();
+
+  if(gameOver || shotInProgress || !allStopped())return;
+
+  const cue=getCueBall();
+  if(cue.pocketed)return;
+
+  mouse=pointerPos(e);
+  dragging=true;
+  dragStart={x:mouse.x,y:mouse.y};
+  power=0;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener("pointerup",e=>{
+  if(!dragging)return;
+
+  mouse=pointerPos(e);
+  dragging=false;
+
+  if(power<2){
+    power=0;
+    updatePower();
+    return;
+  }
+
+  shoot();
+});
+
+function shoot(){
+  const cue=getCueBall();
+
+  let dx=cue.x-mouse.x;
+  let dy=cue.y-mouse.y;
+  let len=Math.hypot(dx,dy);
+
+  if(len<1)return;
+
+  dx/=len;
+  dy/=len;
+
+  const force=MAX_SHOT*(power/100);
+
+  cue.vx=dx*force;
+  cue.vy=dy*force;
+
+  cueSound(force);
+
+  shotInProgress=true;
+  pocketedThisShot=[];
+  cuePocketed=false;
+
+  statusEl.textContent="Billes en mouvement…";
+
+  power=0;
+  updatePower();
+}
+
+function updatePower(){
+  powerFill.style.width=power+"%";
+  powerText.textContent=Math.round(power)+" %";
+}
+
+function draw(){
+  drawBackground();
+  drawTable();
+  drawAim();
+  balls.forEach(drawBall);
+  drawCue();
+}
+
+function drawBackground(){
+  const bg=ctx.createLinearGradient(0,0,0,WORLD_H);
+  bg.addColorStop(0,"#06111e");
+  bg.addColorStop(1,"#02070d");
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,WORLD_W,WORLD_H);
+}
+
+function roundedRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,r);
+}
+
+function drawTable(){
+  ctx.save();
+
+  ctx.shadowColor="rgba(0,0,0,.8)";
+  ctx.shadowBlur=35;
+  ctx.shadowOffsetY=18;
+
+  roundedRect(55,30,1290,640,52);
+
+  const wood=ctx.createLinearGradient(0,30,0,670);
+  wood.addColorStop(0,"#7a431d");
+  wood.addColorStop(.2,"#3b1d0c");
+  wood.addColorStop(.5,"#8d5125");
+  wood.addColorStop(.8,"#35190a");
+  wood.addColorStop(1,"#7b421b");
+
+  ctx.fillStyle=wood;
+  ctx.fill();
+
+  ctx.shadowColor="transparent";
+
+  roundedRect(78,53,1244,594,38);
+  ctx.fillStyle="#15191d";
+  ctx.fill();
+
+  const felt=ctx.createRadialGradient(700,320,50,700,350,720);
+  felt.addColorStop(0,"#159264");
+  felt.addColorStop(.55,"#08744e");
+  felt.addColorStop(1,"#03462f");
+
+  roundedRect(
+    TABLE.left-BALL_R,
+    TABLE.top-BALL_R,
+    TABLE.right-TABLE.left+BALL_R*2,
+    TABLE.bottom-TABLE.top+BALL_R*2,
+    20
+  );
+  ctx.fillStyle=felt;
+  ctx.fill();
+
+  // grain du tapis
+  ctx.globalAlpha=.055;
+  for(let i=0;i<100;i++){
+    ctx.fillStyle=i%2 ? "#fff" : "#000";
+    ctx.fillRect(
+      TABLE.left+Math.random()*(TABLE.right-TABLE.left),
+      TABLE.top+Math.random()*(TABLE.bottom-TABLE.top),
+      1.5,1.5
+    );
+  }
+  ctx.globalAlpha=1;
+
+  // repères
+  ctx.fillStyle="rgba(255,255,255,.45)";
+  for(let i=1;i<8;i++){
+    const x=TABLE.left+(TABLE.right-TABLE.left)*i/8;
+    ctx.beginPath();
+    ctx.arc(x,68,3,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x,632,3,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // poches
+  pockets().forEach(p=>{
+    const g=ctx.createRadialGradient(p.x-5,p.y-5,2,p.x,p.y,TABLE.pocketR+7);
+    g.addColorStop(0,"#000");
+    g.addColorStop(.7,"#020202");
+    g.addColorStop(1,"#171717");
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,TABLE.pocketR+7,0,Math.PI*2);
+    ctx.fillStyle=g;
+    ctx.fill();
+
+    ctx.strokeStyle="rgba(0,0,0,.7)";
+    ctx.lineWidth=5;
+    ctx.stroke();
+  });
+
+  ctx.restore();
+}
+
+function drawBall(b){
+  if(b.pocketed)return;
+
+  ctx.save();
+
+  ctx.shadowColor="rgba(0,0,0,.55)";
+  ctx.shadowBlur=10;
+  ctx.shadowOffsetX=5;
+  ctx.shadowOffsetY=7;
+
+  const base=b.number===0 ? "#f7f7f2" : COLORS[b.number];
+
+  const grad=ctx.createRadialGradient(
+    b.x-BALL_R*.42,b.y-BALL_R*.48,2,
+    b.x,b.y,BALL_R*1.18
+  );
+
+  grad.addColorStop(0,"#ffffff");
+  grad.addColorStop(.18,base);
+  grad.addColorStop(.7,base);
+  grad.addColorStop(1,"#090d12");
+
+  ctx.beginPath();
+  ctx.arc(b.x,b.y,BALL_R,0,Math.PI*2);
+  ctx.fillStyle=grad;
+  ctx.fill();
+
+  ctx.shadowColor="transparent";
+
+  if(b.number>=9){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,BALL_R-.8,0,Math.PI*2);
+    ctx.clip();
+
+    ctx.fillStyle="#f5f3e9";
+    ctx.fillRect(b.x-BALL_R,b.y-7,b.x+BALL_R,14);
+
+    ctx.restore();
+  }
+
+  if(b.number!==0){
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,7.6,0,Math.PI*2);
+    ctx.fillStyle="#f5f4ed";
+    ctx.fill();
+
+    ctx.fillStyle="#151515";
+    ctx.font="bold 9px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(b.number,b.x,b.y+.4);
+  }
+
+  // reflet
+  ctx.beginPath();
+  ctx.ellipse(
+    b.x-BALL_R*.38,
+    b.y-BALL_R*.45,
+    BALL_R*.25,
+    BALL_R*.15,
+    -.5,0,Math.PI*2
+  );
+  ctx.fillStyle="rgba(255,255,255,.55)";
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawAim(){
+  if(gameOver || shotInProgress || !allStopped())return;
+
+  const cue=getCueBall();
+  if(cue.pocketed)return;
+
+  let dx=mouse.x-cue.x;
+  let dy=mouse.y-cue.y;
+  const len=Math.hypot(dx,dy);
+
+  if(len<1)return;
+
+  dx/=len;
+  dy/=len;
+
+  let hitDist=1000;
+
+  // première collision approximative avec une bille
+  balls.forEach(b=>{
+    if(b===cue || b.pocketed)return;
+
+    const ox=b.x-cue.x;
+    const oy=b.y-cue.y;
+    const projection=ox*dx+oy*dy;
+
+    if(projection<=0)return;
+
+    const perp=Math.abs(ox*dy-oy*dx);
+
+    if(perp<BALL_R*2){
+      const offset=Math.sqrt(
+        Math.max(0,(BALL_R*2)**2-perp**2)
+      );
+      const d=projection-offset;
+      if(d<hitDist)hitDist=d;
+    }
+  });
+
+  ctx.save();
+
+  ctx.setLineDash([10,9]);
+  ctx.strokeStyle="rgba(255,255,255,.75)";
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+  ctx.moveTo(cue.x,cue.y);
+  ctx.lineTo(
+    cue.x+dx*Math.min(hitDist,900),
+    cue.y+dy*Math.min(hitDist,900)
+  );
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+
+  if(hitDist<1000){
+    const hx=cue.x+dx*hitDist;
+    const hy=cue.y+dy*hitDist;
+
+    ctx.beginPath();
+    ctx.arc(hx,hy,BALL_R,0,Math.PI*2);
+    ctx.strokeStyle="rgba(255,255,255,.42)";
+    ctx.lineWidth=2;
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawCue(){
+  if(gameOver || shotInProgress || !allStopped())return;
+
+  const cue=getCueBall();
+  if(cue.pocketed)return;
+
+  let dx=mouse.x-cue.x;
+  let dy=mouse.y-cue.y;
+  let len=Math.hypot(dx,dy);
+
+  if(len<1)return;
+
+  dx/=len;
+  dy/=len;
+
+  const pull=dragging ? power*1.35 : 18;
+  const start=BALL_R+13+pull;
+  const cueLength=330;
+
+  const x1=cue.x-dx*start;
+  const y1=cue.y-dy*start;
+  const x2=cue.x-dx*(start+cueLength);
+  const y2=cue.y-dy*(start+cueLength);
+
+  ctx.save();
+
+  ctx.lineCap="round";
+
+  ctx.strokeStyle="rgba(0,0,0,.45)";
+  ctx.lineWidth=12;
+  ctx.beginPath();
+  ctx.moveTo(x1+5,y1+6);
+  ctx.lineTo(x2+5,y2+6);
+  ctx.stroke();
+
+  const cueGrad=ctx.createLinearGradient(x1,y1,x2,y2);
+  cueGrad.addColorStop(0,"#f1d8a4");
+  cueGrad.addColorStop(.48,"#d79c4c");
+  cueGrad.addColorStop(.72,"#7a3216");
+  cueGrad.addColorStop(1,"#30120b");
+
+  ctx.strokeStyle=cueGrad;
+  ctx.lineWidth=8;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+
+  ctx.strokeStyle="#5bc8ff";
+  ctx.lineWidth=5;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(
+    x1-dx*10,
+    y1-dy*10
+  );
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function frame(now){
+  const delta=Math.min(.033,(now-lastTime)/1000);
+  lastTime=now;
+  accumulator+=delta;
+
+  while(accumulator>=STEP){
+    physics(STEP);
+    accumulator-=STEP;
+  }
+
+  updateGameState();
+  draw();
+
+  requestAnimationFrame(frame);
+}
+
+document.getElementById("newBtn").addEventListener("click",()=>{
+  initAudio();
+  setupGame();
+});
+
+resizeCanvas();
+setupGame();
+requestAnimationFrame(frame);
+
+</script>
+</body>
+</html>

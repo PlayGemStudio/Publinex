@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Publinex Pinball — Crystal Quest</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#03040d;
+  font-family:Arial,Helvetica,sans-serif;
+  color:white;
+}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 50% 35%,#15104b 0%,#08051e 35%,#02030a 75%);
+}
+#game{
+  position:relative;
+  width:min(620px,96vw);
+  height:min(900px,96vh);
+  border:2px solid #247cff;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:
+    0 0 35px #087cff88,
+    0 0 90px #9b27ff44;
+}
+canvas{
+  width:100%;
+  height:100%;
+  display:block;
+}
+.hud{
+  position:absolute;
+  z-index:5;
+  top:13px;
+  left:18px;
+  right:18px;
+  display:flex;
+  justify-content:space-between;
+  pointer-events:none;
+  text-shadow:0 0 12px #00aaff;
+}
+.title{
+  font-weight:900;
+  font-size:19px;
+  letter-spacing:1px;
+}
+.score{
+  text-align:right;
+  font-weight:900;
+  color:#ffb328;
+}
+.help{
+  position:absolute;
+  z-index:6;
+  bottom:9px;
+  left:50%;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  padding:8px 14px;
+  border-radius:12px;
+  background:#020615cc;
+  border:1px solid #2e7dff;
+  font-size:12px;
+  pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+  <div class="hud">
+    <div>
+      <div class="title">PUBLINEX PINBALL</div>
+      <small>CRYSTAL QUEST</small>
+    </div>
+    <div class="score">
+      SCORE<br>
+      <span id="score">000000</span>
+    </div>
+  </div>
+
+  <div class="help">
+    ← BATTEUR GAUCHE &nbsp; • &nbsp; ESPACE LANCEUR &nbsp; • &nbsp; BATTEUR DROIT →
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+
+<script>
+"use strict";
+
+const {
+  Engine,
+  Render,
+  Runner,
+  Bodies,
+  Body,
+  Composite,
+  Events,
+  Constraint,
+  Vector
+}=Matter;
+
+/* ==========================================================
+   MOTEUR
+========================================================== */
+
+const GAME_W=600;
+const GAME_H=900;
+
+const engine=Engine.create({
+  gravity:{x:0,y:1,scale:0.00135}
+});
+
+engine.positionIterations=10;
+engine.velocityIterations=8;
+engine.constraintIterations=4;
+
+const world=engine.world;
+
+const container=document.getElementById("game");
+
+const render=Render.create({
+  element:container,
+  engine,
+  options:{
+    width:GAME_W,
+    height:GAME_H,
+    wireframes:false,
+    background:"#07051c",
+    pixelRatio:Math.min(window.devicePixelRatio,2)
+  }
+});
+
+Render.run(render);
+
+const runner=Runner.create({
+  isFixed:true,
+  delta:1000/60
+});
+
+Runner.run(runner,engine);
+
+/* ==========================================================
+   COULEURS
+========================================================== */
+
+const neonBlue="#0ab7ff";
+const neonPink="#ff24dc";
+const neonOrange="#ff861c";
+const neonPurple="#8628ff";
+const metal="#273044";
+const dark="#080b18";
+
+/* ==========================================================
+   MURS
+========================================================== */
+
+function wall(x,y,w,h,angle=0,color=metal){
+  return Bodies.rectangle(x,y,w,h,{
+    isStatic:true,
+    angle,
+    restitution:.72,
+    friction:0,
+    render:{
+      fillStyle:color,
+      strokeStyle:"#72cfff",
+      lineWidth:2
+    }
+  });
+}
+
+const walls=[
+  wall(22,450,35,900),
+  wall(578,450,35,900),
+  wall(300,18,600,35),
+
+  wall(115,150,190,18,.16),
+  wall(485,150,190,18,-.16),
+
+  wall(105,700,185,20,.52),
+  wall(495,700,185,20,-.52),
+
+  wall(570,480,18,650)
+];
+
+Composite.add(world,walls);
+
+/* ==========================================================
+   COULOIR DE LANCEMENT
+========================================================== */
+
+Composite.add(world,[
+  wall(525,505,15,570),
+  wall(570,505,15,570)
+]);
+
+/* ==========================================================
+   BUMPERS
+========================================================== */
+
+const bumpers=[];
+
+function bumper(x,y,r,color){
+  const b=Bodies.circle(x,y,r,{
+    isStatic:true,
+    restitution:1.55,
+    friction:0,
+    label:"bumper",
+    render:{
+      fillStyle:color,
+      strokeStyle:"#ffffff",
+      lineWidth:5
+    }
+  });
+
+  b.baseColor=color;
+  bumpers.push(b);
+  Composite.add(world,b);
+  return b;
+}
+
+bumper(220,275,34,neonBlue);
+bumper(300,235,34,neonPink);
+bumper(380,275,34,neonOrange);
+
+bumper(185,410,28,neonPurple);
+bumper(415,410,28,neonBlue);
+
+bumper(300,365,31,neonPink);
+
+/* ==========================================================
+   CIBLES
+========================================================== */
+
+function target(x,y,w,h,color){
+  const b=Bodies.rectangle(x,y,w,h,{
+    isStatic:true,
+    restitution:1,
+    label:"target",
+    render:{
+      fillStyle:color,
+      strokeStyle:"#fff",
+      lineWidth:2
+    }
+  });
+
+  Composite.add(world,b);
+}
+
+target(120,300,20,70,neonOrange);
+target(480,300,20,70,neonBlue);
+target(145,515,22,65,neonPink);
+target(455,515,22,65,neonPurple);
+
+/* ==========================================================
+   GUIDES
+========================================================== */
+
+Composite.add(world,[
+  wall(150,595,170,16,.27,neonBlue),
+  wall(450,595,170,16,-.27,neonPink),
+
+  wall(155,645,125,13,.35,dark),
+  wall(445,645,125,13,-.35,dark)
+]);
+
+/* ==========================================================
+   BATTEURS
+========================================================== */
+
+function makeFlipper(x,y,isLeft){
+
+  const paddle=Bodies.rectangle(
+    x,
+    y,
+    115,
+    25,
+    {
+      density:.01,
+      friction:0,
+      frictionAir:.02,
+      restitution:.15,
+      collisionFilter:{group:-1},
+      render:{
+        fillStyle:isLeft ? "#e93162" : "#247cff",
+        strokeStyle:"#ffffff",
+        lineWidth:4
+      }
+    }
+  );
+
+  const pivotX=isLeft ? x-48 : x+48;
+
+  const pivot=Constraint.create({
+    pointA:{x:pivotX,y},
+    bodyB:paddle,
+    pointB:{
+      x:isLeft ? -48 : 48,
+      y:0
+    },
+    stiffness:1,
+    length:0
+  });
+
+  Composite.add(world,[paddle,pivot]);
+
+  return{
+    body:paddle,
+    left:isLeft,
+    rest:isLeft ? .28 : -.28,
+    active:isLeft ? -.48 : .48
+  };
+}
+
+const leftFlipper=makeFlipper(220,730,true);
+const rightFlipper=makeFlipper(380,730,false);
+
+function controlFlipper(flipper,pressed){
+
+  const targetAngle=pressed
+    ? flipper.active
+    : flipper.rest;
+
+  let difference=targetAngle-flipper.body.angle;
+
+  while(difference>Math.PI) difference-=Math.PI*2;
+  while(difference<-Math.PI) difference+=Math.PI*2;
+
+  Body.setAngularVelocity(
+    flipper.body,
+    difference * .48
+  );
+}
+
+/* ==========================================================
+   BALLE
+========================================================== */
+
+let ball=null;
+
+function createBall(){
+
+  if(ball){
+    Composite.remove(world,ball);
+  }
+
+  ball=Bodies.circle(
+    548,
+    720,
+    13,
+    {
+      density:.004,
+      restitution:.76,
+      friction:.002,
+      frictionAir:.0012,
+      label:"ball",
+      render:{
+        fillStyle:"#e9f7ff",
+        strokeStyle:"#ffffff",
+        lineWidth:3
+      }
+    }
+  );
+
+  Composite.add(world,ball);
+}
+
+createBall();
+
+/* ==========================================================
+   LANCEUR
+========================================================== */
+
+let launcherPower=0;
+let spacePressed=false;
+
+function launch(){
+
+  if(!ball)return;
+
+  if(ball.x>515){
+
+    const power=Math.min(
+      22,
+      12 + launcherPower*.15
+    );
+
+    Body.setVelocity(ball,{
+      x:-1.2,
+      y:-power
+    });
+  }
+
+  launcherPower=0;
+}
+
+/* ==========================================================
+   CLAVIER
+========================================================== */
+
+const keys={
+  left:false,
+  right:false
+};
+
+window.addEventListener("keydown",e=>{
+
+  if(["ArrowLeft","ArrowRight","Space"].includes(e.code)){
+    e.preventDefault();
+  }
+
+  if(e.code==="ArrowLeft"){
+    keys.left=true;
+  }
+
+  if(e.code==="ArrowRight"){
+    keys.right=true;
+  }
+
+  if(e.code==="Space" && !spacePressed){
+    spacePressed=true;
+    launcherPower=0;
+  }
+});
+
+window.addEventListener("keyup",e=>{
+
+  if(e.code==="ArrowLeft"){
+    keys.left=false;
+  }
+
+  if(e.code==="ArrowRight"){
+    keys.right=false;
+  }
+
+  if(e.code==="Space"){
+    spacePressed=false;
+    launch();
+  }
+});
+
+/* ==========================================================
+   SCORE
+========================================================== */
+
+let score=0;
+const scoreEl=document.getElementById("score");
+
+function addScore(value){
+  score+=value;
+  scoreEl.textContent=
+    String(score).padStart(6,"0");
+}
+
+/* ==========================================================
+   COLLISIONS
+========================================================== */
+
+Events.on(engine,"collisionStart",event=>{
+
+  for(const pair of event.pairs){
+
+    const A=pair.bodyA;
+    const B=pair.bodyB;
+
+    const other=
+      A.label==="ball" ? B :
+      B.label==="ball" ? A :
+      null;
+
+    if(!other)continue;
+
+    if(other.label==="bumper"){
+
+      addScore(250);
+
+      const direction=Vector.normalise(
+        Vector.sub(ball.position,other.position)
+      );
+
+      Body.applyForce(
+        ball,
+        ball.position,
+        {
+          x:direction.x*.018,
+          y:direction.y*.018
+        }
+      );
+
+      other.render.fillStyle="#ffffff";
+
+      setTimeout(()=>{
+        other.render.fillStyle=other.baseColor;
+      },70);
+    }
+
+    if(other.label==="target"){
+      addScore(100);
+    }
+  }
+});
+
+/* ==========================================================
+   BOUCLE
+========================================================== */
+
+Events.on(engine,"beforeUpdate",()=>{
+
+  controlFlipper(leftFlipper,keys.left);
+  controlFlipper(rightFlipper,keys.right);
+
+  if(spacePressed){
+    launcherPower=Math.min(70,launcherPower+1.5);
+  }
+
+  if(ball){
+
+    const speed=Body.getSpeed(ball);
+
+    if(speed>32){
+      Body.setSpeed(ball,32);
+    }
+
+    /* balle perdue */
+    if(ball.position.y>875){
+      setTimeout(createBall,350);
+      Composite.remove(world,ball);
+      ball=null;
+    }
+  }
+});
+
+/* ==========================================================
+   EFFETS VISUELS CANVAS
+========================================================== */
+
+Events.on(render,"afterRender",()=>{
+
+  const c=render.context;
+
+  c.save();
+
+  /* halo autour des bumpers */
+  c.globalCompositeOperation="lighter";
+
+  for(const b of bumpers){
+
+    const g=c.createRadialGradient(
+      b.position.x,
+      b.position.y,
+      5,
+      b.position.x,
+      b.position.y,
+      58
+    );
+
+    g.addColorStop(0,b.baseColor+"88");
+    g.addColorStop(1,"transparent");
+
+    c.fillStyle=g;
+    c.beginPath();
+    c.arc(
+      b.position.x,
+      b.position.y,
+      58,
+      0,
+      Math.PI*2
+    );
+    c.fill();
+  }
+
+  /* halo balle */
+  if(ball){
+
+    const g=c.createRadialGradient(
+      ball.position.x,
+      ball.position.y,
+      2,
+      ball.position.x,
+      ball.position.y,
+      27
+    );
+
+    g.addColorStop(0,"#ffffff66");
+    g.addColorStop(1,"transparent");
+
+    c.fillStyle=g;
+    c.beginPath();
+    c.arc(
+      ball.position.x,
+      ball.position.y,
+      27,
+      0,
+      Math.PI*2
+    );
+    c.fill();
+  }
+
+  c.restore();
+});
+
+</script>
+</body>
+</html>

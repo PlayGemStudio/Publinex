@@ -2,538 +2,870 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Publinex 8 Ball</title>
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:#030811;
+  color:white;
   font-family:Segoe UI,Arial,sans-serif;
-  color:#fff;
-  background:#020812;
+  overflow:hidden;
   user-select:none;
 }
-#game{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 15%,rgba(31,111,139,.45),transparent 32%),
-    linear-gradient(#071825 0 57%,#02070c 100%);
-}
-.room{
-  position:absolute;inset:0;
-  overflow:hidden;
-}
-.ceiling{
-  position:absolute;left:0;right:0;top:0;height:17%;
-  background:linear-gradient(#02070b,#09151d);
-  border-bottom:2px solid rgba(255,255,255,.05);
-}
-.lamp{
-  position:absolute;top:7%;width:20%;height:5%;
-  border-radius:50%;
-  background:linear-gradient(#0b1013,#272f31,#090d0f);
-  box-shadow:0 18px 50px rgba(255,215,120,.28);
-}
-.lamp:after{
-  content:"";position:absolute;left:10%;right:10%;top:55%;height:180%;
-  background:linear-gradient(90deg,transparent,rgba(255,220,145,.13),transparent);
-  clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);
-}
-.l1{left:13%}.l2{right:13%}
 
-.wallGlow{
-  position:absolute;left:10%;right:10%;top:14%;height:27%;
+body{
   background:
-    radial-gradient(circle at 20% 40%,rgba(0,157,255,.17),transparent 22%),
-    radial-gradient(circle at 80% 40%,rgba(0,157,255,.17),transparent 22%);
+    radial-gradient(circle at 50% 0,#123b4a 0,#071522 35%,#02070d 75%);
 }
-.sign{
-  position:absolute;top:18%;left:50%;transform:translateX(-50%);
-  font-weight:900;font-size:clamp(20px,2.5vw,42px);
-  letter-spacing:4px;color:#eaf8ff;
-  text-shadow:0 0 8px #16a9ff,0 0 24px #087bc1;
+
+header{
+  height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  background:rgba(2,8,14,.96);
+  border-bottom:1px solid #17364b;
+  position:relative;
+  z-index:10;
 }
-.sign span{color:#30b4ff}
-.poster{
-  position:absolute;top:19%;
-  width:11%;height:14%;
-  border:4px solid #352519;
-  background:linear-gradient(135deg,#222,#090909);
-  box-shadow:0 10px 25px #000;
-  display:flex;align-items:center;justify-content:center;
-  text-align:center;font-weight:900;font-size:clamp(8px,1vw,15px);
-  color:#d9c9a8;
+
+.logo{
+  font-size:24px;
+  font-weight:900;
 }
-.poster.left{left:7%}.poster.right{right:7%}
+
+.logo span{color:#2db5ff}
+
+.players{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:18px;
+  align-items:center;
+  font-weight:900;
+}
+
+.players .active{
+  color:#42c5ff;
+  text-shadow:0 0 12px #168dd0;
+}
+
+.score{
+  font-size:22px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+}
+
+button{
+  border:1px solid #31516b;
+  border-radius:9px;
+  padding:9px 13px;
+  color:#fff;
+  background:linear-gradient(#183650,#0a1b2a);
+  font-weight:800;
+  cursor:pointer;
+}
+
+button:hover{filter:brightness(1.15)}
+
+.room{
+  position:relative;
+  height:calc(100vh - 62px);
+  min-height:600px;
+  overflow:hidden;
+}
+
+.title{
+  position:absolute;
+  top:18px;
+  width:100%;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:4px;
+  color:#ccefff;
+  font-size:18px;
+  opacity:.9;
+}
+
+.lamp{
+  position:absolute;
+  top:5px;
+  width:280px;
+  height:70px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,#504729 0,#171b19 42%,transparent 70%);
+  filter:drop-shadow(0 20px 28px rgba(255,220,120,.12));
+}
+
+.lamp.left{left:15%}
+.lamp.right{right:15%}
 
 .crowd{
-  position:absolute;left:0;right:0;top:30%;height:28%;
-  overflow:hidden;
-  opacity:.85;
-}
-.person{
-  position:absolute;bottom:0;
-  width:32px;height:92px;
-  transform-origin:bottom center;
-  animation:sway 3s ease-in-out infinite alternate;
-}
-.person:before{
-  content:"";position:absolute;top:0;left:7px;
-  width:18px;height:18px;border-radius:50%;
-  background:#b77b57;
-  box-shadow:0 0 8px rgba(255,190,140,.12);
-}
-.person:after{
-  content:"";position:absolute;top:17px;left:2px;
-  width:28px;height:72px;border-radius:10px 10px 4px 4px;
-  background:linear-gradient(90deg,#0a1118,#1b3343,#080d12);
-}
-@keyframes sway{
-  from{transform:rotate(-1.2deg)}
-  to{transform:rotate(1.2deg)}
-}
-
-.topbar{
-  position:absolute;z-index:20;left:0;right:0;top:0;height:58px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  background:linear-gradient(rgba(2,8,15,.97),rgba(3,14,25,.88));
-  border-bottom:1px solid rgba(74,180,255,.18);
-}
-.logo{font-size:23px;font-weight:900;letter-spacing:-1px}
-.logo b{color:#31afff}
-.score{
-  position:absolute;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:18px;font-weight:900
-}
-.score strong{font-size:23px}
-.score small{color:#8faac0}
-.buttons{display:flex;gap:8px}
-button{
-  border:1px solid rgba(255,255,255,.15);
-  background:linear-gradient(#17334c,#091a2a);
-  color:#fff;border-radius:9px;padding:8px 12px;
-  font-weight:800;cursor:pointer
-}
-button:hover{filter:brightness(1.18)}
-
-.tableArea{
   position:absolute;
-  z-index:10;
+  left:0;
+  right:0;
+  top:100px;
+  height:330px;
+  opacity:.6;
+  pointer-events:none;
+}
+
+.person{
+  position:absolute;
+  bottom:0;
+  width:30px;
+  height:90px;
+  animation:sway 3s ease-in-out infinite alternate;
+  transform-origin:bottom;
+}
+
+.person:before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  left:6px;
+  background:#9d7055;
+}
+
+.person:after{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:16px;
+  width:27px;
+  height:72px;
+  border-radius:9px 9px 3px 3px;
+  background:linear-gradient(90deg,#050a0f,#183044,#05090d);
+}
+
+@keyframes sway{
+  from{transform:rotate(-1deg)}
+  to{transform:rotate(1deg)}
+}
+
+.gameShell{
+  position:absolute;
+  z-index:5;
   left:50%;
-  top:56%;
+  top:52%;
   transform:translate(-50%,-50%);
-  width:min(1120px,86vw);
+  width:min(1080px,82vw);
+}
+
+.tableFrame{
+  position:relative;
+  width:100%;
   aspect-ratio:2/1;
-  filter:drop-shadow(0 32px 32px rgba(0,0,0,.72));
+  padding:25px;
+  border-radius:30px;
+  background:
+    linear-gradient(90deg,
+      #3a1808 0,
+      #925120 10%,
+      #4a210d 25%,
+      #a15b27 50%,
+      #49200d 75%,
+      #915020 90%,
+      #351507 100%);
+  box-shadow:
+    0 30px 45px rgba(0,0,0,.8),
+    inset 0 0 0 3px rgba(255,191,91,.22);
 }
+
+.tableFrame:before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border:2px solid rgba(234,179,91,.28);
+  border-radius:23px;
+  pointer-events:none;
+}
+
 canvas{
-  width:100%;height:100%;display:block;
-  touch-action:none;cursor:crosshair;
+  display:block;
+  width:100%;
+  aspect-ratio:2/1;
+  background:#08764f;
+  border-radius:12px;
+  touch-action:none;
+  cursor:crosshair;
 }
-.bottom{
-  position:absolute;z-index:30;
-  left:50%;bottom:10px;transform:translateX(-50%);
-  width:min(900px,92vw);
-  min-height:54px;
-  display:flex;align-items:center;justify-content:center;
-  gap:15px;padding:8px 16px;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:15px;
-  background:rgba(2,10,18,.88);
-  box-shadow:0 10px 30px #000;
+
+.controls{
+  margin:12px auto 0;
+  width:min(850px,90%);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:10px 15px;
+  border:1px solid #17354a;
+  border-radius:14px;
+  background:rgba(2,9,16,.93);
+  box-shadow:0 10px 25px rgba(0,0,0,.6);
 }
-#message{
-  min-width:240px;text-align:center;
-  color:#dcefff;font-size:13px;font-weight:800
+
+.instructions{
+  min-width:360px;
+  font-size:13px;
+  font-weight:800;
+  text-align:center;
 }
-.meter{
-  width:min(350px,34vw);height:13px;
-  background:#02060a;border-radius:99px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.14)
+
+.power{
+  flex:1;
+  height:14px;
+  overflow:hidden;
+  border-radius:20px;
+  border:1px solid #304656;
+  background:#010407;
 }
-#meterFill{
-  height:100%;width:0;
-  background:linear-gradient(90deg,#24b9ff,#29d98c 50%,#ffd53c 76%,#ff4545);
+
+.powerFill{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#22b9ff,#32dc83,#ffd83e,#ff4040);
 }
-#powerText{width:50px;font-weight:900;font-size:12px}
-@media(max-width:800px){
-  .tableArea{width:96vw;top:54%}
-  .poster,.crowd{opacity:.45}
-  .logo{font-size:18px}
-  .score small{display:none}
-  button{font-size:11px;padding:7px}
-  .bottom{bottom:4px}
+
+.powerText{
+  width:48px;
+  font-size:12px;
+  font-weight:900;
+}
+
+@media(max-width:950px){
+  .gameShell{width:94vw}
+  .players{font-size:12px}
+  .instructions{min-width:220px}
 }
 </style>
 </head>
 
 <body>
-<div id="game">
-  <div class="room">
-    <div class="ceiling"></div>
-    <div class="lamp l1"></div>
-    <div class="lamp l2"></div>
-    <div class="wallGlow"></div>
-    <div class="sign">PUBLI<b>NEX</b> 8 BALL</div>
-    <div class="poster left">GOOD<br>GAME</div>
-    <div class="poster right">BILLIARDS<br>CLUB</div>
-    <div id="crowd" class="crowd"></div>
+
+<header>
+  <div class="logo">Publi<span>nex</span></div>
+
+  <div class="players">
+    <span id="player1" class="active">JOUEUR 1</span>
+    <span class="score" id="score">0 — 0</span>
+    <span id="player2">JOUEUR 2</span>
   </div>
 
-  <div class="topbar">
-    <div class="logo">Publi<b>nex</b></div>
+  <div class="actions">
+    <button id="musicButton">♫ MUSIQUE</button>
+    <button id="soundButton">🔊 SON</button>
+    <button id="newButton">↻ PARTIE</button>
+    <button onclick="location.href='jeux.html'">RETOUR</button>
+  </div>
+</header>
 
-    <div class="score">
-      <span id="p1">JOUEUR 1</span>
-      <strong id="score">0 — 0</strong>
-      <span id="p2">JOUEUR 2</span>
-      <small>8 BALL</small>
+<div class="room">
+
+  <div class="title">PUBLINEX BILLIARDS CLUB</div>
+  <div class="lamp left"></div>
+  <div class="lamp right"></div>
+  <div class="crowd" id="crowd"></div>
+
+  <div class="gameShell">
+
+    <div class="tableFrame">
+      <canvas id="table"></canvas>
     </div>
 
-    <div class="buttons">
-      <button id="musicBtn">♫ MUSIQUE</button>
-      <button id="soundBtn">🔊 SON</button>
-      <button id="newBtn">↻ PARTIE</button>
-      <button onclick="location.href='jeux.html'">RETOUR</button>
+    <div class="controls">
+      <div class="instructions" id="instructions">
+        Déplace la souris pour viser • Maintiens et recule la queue • Relâche pour tirer
+      </div>
+
+      <div class="power">
+        <div class="powerFill" id="powerFill"></div>
+      </div>
+
+      <div class="powerText" id="powerText">0 %</div>
     </div>
-  </div>
 
-  <div class="tableArea">
-    <canvas id="pool"></canvas>
-  </div>
-
-  <div class="bottom">
-    <div id="message">Déplace la souris pour viser</div>
-    <div class="meter"><div id="meterFill"></div></div>
-    <div id="powerText">0 %</div>
   </div>
 </div>
 
 <script>
 "use strict";
 
-const canvas=document.getElementById("pool");
-const ctx=canvas.getContext("2d");
-const meter=document.getElementById("meterFill");
-const powerText=document.getElementById("powerText");
-const message=document.getElementById("message");
-const musicBtn=document.getElementById("musicBtn");
-const soundBtn=document.getElementById("soundBtn");
+/* =========================================================
+   PUBLINEX 8 BALL
+   ========================================================= */
 
-const W=1200,H=600;
-const R=18;
+const canvas = document.getElementById("table");
+const ctx = canvas.getContext("2d");
 
-const T={
-  l:118,r:1082,t:92,b:508,
-  pocket:34
-};
+const powerFill = document.getElementById("powerFill");
+const powerText = document.getElementById("powerText");
+const instructions = document.getElementById("instructions");
 
-let balls=[];
-let pointer={x:340,y:300};
-let aimingAngle=0;
+const LOGICAL_W = 1100;
+const LOGICAL_H = 550;
 
-let pulling=false;
-let pullStart=null;
-let pullDistance=0;
+const LEFT   = 68;
+const RIGHT  = 1032;
+const TOP    = 58;
+const BOTTOM = 492;
 
-let moving=false;
-let gameOver=false;
+const BALL_R = 18;
+const POCKET_R = 29;
 
-let last=performance.now();
-let acc=0;
-const STEP=1/120;
+let balls = [];
 
-const friction=.9915;
-const bounce=.91;
-const restitution=.97;
+let aimAngle = 0;
+let lockedAngle = 0;
 
-const colours={
-  1:"#f5d31e",2:"#2565d9",3:"#e23338",4:"#7337ae",
-  5:"#ee7b18",6:"#159257",7:"#801d27",8:"#111318",
-  9:"#f5d31e",10:"#2565d9",11:"#e23338",12:"#7337ae",
-  13:"#ee7b18",14:"#159257",15:"#801d27"
-};
+let mouse = {x:350,y:275};
 
-/* ---------- PUBLIC ANIMÉ ---------- */
+let charging = false;
+let dragStart = null;
+let pull = 0;
 
-const crowd=document.getElementById("crowd");
+const MAX_PULL = 145;
 
-for(let i=0;i<38;i++){
+let ballsMoving = false;
+let scratchPending = false;
+
+let lastTime = performance.now();
+let accumulator = 0;
+
+const FIXED_STEP = 1 / 120;
+
+
+/* =========================================================
+   PUBLIC
+   ========================================================= */
+
+const crowd = document.getElementById("crowd");
+
+for(let i=0;i<36;i++){
+
   const p=document.createElement("div");
   p.className="person";
-  p.style.left=(i*2.7+Math.random()*2)+"%";
-  p.style.height=(70+Math.random()*35)+"px";
+
+  p.style.left=(1+i*2.8)+"%";
+  p.style.height=(68+Math.random()*32)+"px";
+  p.style.opacity=(.35+Math.random()*.5);
   p.style.animationDelay=(-Math.random()*3)+"s";
-  p.style.animationDuration=(2.3+Math.random()*2)+"s";
-  p.style.opacity=(.35+Math.random()*.55);
+  p.style.animationDuration=(2.4+Math.random()*2)+"s";
+
   crowd.appendChild(p);
 }
 
-/* ---------- AUDIO ---------- */
 
-let ac=null;
-let master=null;
+/* =========================================================
+   AUDIO
+   ========================================================= */
+
+let audioContext=null;
+
+let masterGain=null;
 let musicGain=null;
-let fxGain=null;
-let musicOn=true;
-let soundOn=true;
-let musicStarted=false;
+let effectsGain=null;
+
+let musicEnabled=true;
+let effectsEnabled=true;
+
+let musicRunning=false;
 let musicTimer=null;
-let musicStep=0;
+let beat=0;
 
-function audioStart(){
-  if(!ac){
-    ac=new (window.AudioContext||window.webkitAudioContext)();
+function ensureAudio(){
 
-    master=ac.createGain();
-    musicGain=ac.createGain();
-    fxGain=ac.createGain();
+  if(!audioContext){
+
+    audioContext=
+      new (window.AudioContext || window.webkitAudioContext)();
+
+    masterGain=audioContext.createGain();
+    musicGain=audioContext.createGain();
+    effectsGain=audioContext.createGain();
 
     /*
-      Sortie jeu pleine échelle.
-      Les sous-mix sont équilibrés séparément.
+       Musique volontairement beaucoup plus présente
+       que dans la version précédente.
     */
-    master.gain.value=.95;
-    musicGain.gain.value=.24;
-    fxGain.gain.value=.92;
 
-    musicGain.connect(master);
-    fxGain.connect(master);
-    master.connect(ac.destination);
+    masterGain.gain.value=.95;
+    musicGain.gain.value=.58;
+    effectsGain.gain.value=.9;
+
+    musicGain.connect(masterGain);
+    effectsGain.connect(masterGain);
+    masterGain.connect(audioContext.destination);
   }
 
-  if(ac.state==="suspended") ac.resume();
+  if(audioContext.state==="suspended"){
+    audioContext.resume();
+  }
 
-  if(musicOn&&!musicStarted){
+  if(musicEnabled && !musicRunning){
     startMusic();
   }
 }
 
-function osc(freq,dur,vol,type="sine",destination=fxGain,delay=0,end=null){
-  if(!ac||!destination)return;
 
-  const t=ac.currentTime+delay;
-  const o=ac.createOscillator();
-  const g=ac.createGain();
+function tone(freq,duration,volume,type="sine",destination=effectsGain,delay=0,endFreq=null){
 
-  o.type=type;
-  o.frequency.setValueAtTime(freq,t);
+  if(!audioContext || !destination)return;
 
-  if(end){
-    o.frequency.exponentialRampToValueAtTime(Math.max(25,end),t+dur);
+  const now=audioContext.currentTime+delay;
+
+  const osc=audioContext.createOscillator();
+  const gain=audioContext.createGain();
+
+  osc.type=type;
+
+  osc.frequency.setValueAtTime(freq,now);
+
+  if(endFreq){
+    osc.frequency.exponentialRampToValueAtTime(
+      Math.max(20,endFreq),
+      now+duration
+    );
   }
 
-  g.gain.setValueAtTime(.0001,t);
-  g.gain.exponentialRampToValueAtTime(Math.max(.001,vol),t+.008);
-  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  gain.gain.setValueAtTime(.0001,now);
+  gain.gain.exponentialRampToValueAtTime(
+    Math.max(.001,volume),
+    now+.015
+  );
 
-  o.connect(g);
-  g.connect(destination);
+  gain.gain.exponentialRampToValueAtTime(
+    .0001,
+    now+duration
+  );
 
-  o.start(t);
-  o.stop(t+dur+.03);
+  osc.connect(gain);
+  gain.connect(destination);
+
+  osc.start(now);
+  osc.stop(now+duration+.04);
 }
 
-function noise(dur,vol,cutoff){
-  if(!ac||!soundOn)return;
 
-  const n=Math.floor(ac.sampleRate*dur);
-  const buffer=ac.createBuffer(1,n,ac.sampleRate);
+function audioNoise(duration,volume,cutoff){
+
+  if(!audioContext || !effectsEnabled)return;
+
+  const length=
+    Math.floor(audioContext.sampleRate*duration);
+
+  const buffer=
+    audioContext.createBuffer(
+      1,
+      length,
+      audioContext.sampleRate
+    );
+
   const data=buffer.getChannelData(0);
 
-  for(let i=0;i<n;i++){
-    data[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
+  for(let i=0;i<length;i++){
+    data[i]=(Math.random()*2-1)*
+      Math.pow(1-i/length,2);
   }
 
-  const src=ac.createBufferSource();
-  const filter=ac.createBiquadFilter();
-  const gain=ac.createGain();
+  const source=audioContext.createBufferSource();
+  const filter=audioContext.createBiquadFilter();
+  const gain=audioContext.createGain();
 
-  src.buffer=buffer;
+  source.buffer=buffer;
+
   filter.type="lowpass";
   filter.frequency.value=cutoff;
-  gain.gain.value=vol;
 
-  src.connect(filter);
+  gain.gain.value=volume;
+
+  source.connect(filter);
   filter.connect(gain);
-  gain.connect(fxGain);
-  src.start();
+  gain.connect(effectsGain);
+
+  source.start();
 }
 
-/*
-  Musique originale générée en temps réel.
-  Lounge / jeu sportif, sans fichier musical externe.
-*/
-const bass=[55,55,65.41,55,73.42,65.41,49,55];
-const chords=[
-  [220,261.63,329.63],
+
+/* ---------- musique lounge originale ---------- */
+
+const bassNotes=[
+  55,
+  65.41,
+  73.42,
+  65.41,
+  49,
+  55,
+  65.41,
+  73.42
+];
+
+const chordNotes=[
   [220,261.63,329.63],
   [196,246.94,293.66],
-  [220,261.63,329.63],
   [174.61,220,261.63],
-  [196,246.94,293.66],
-  [164.81,220,246.94],
   [196,246.94,293.66]
 ];
 
-function musicBeat(){
-  if(!ac||!musicOn)return;
 
-  const step=musicStep%8;
+function playBeat(){
 
-  osc(bass[step],.46,.12,"sine",musicGain);
+  if(!audioContext || !musicEnabled)return;
 
-  chords[step].forEach((f,i)=>{
-    osc(f,.7,.025,"triangle",musicGain,i*.012);
-  });
+  const s=beat%8;
 
-  if(step%2===0){
-    osc(880,.035,.018,"sine",musicGain);
+  tone(
+    bassNotes[s],
+    .38,
+    .13,
+    "triangle",
+    musicGain
+  );
+
+  if(s%2===0){
+
+    const chord=
+      chordNotes[(s/2)%chordNotes.length];
+
+    chord.forEach((f,i)=>{
+
+      tone(
+        f,
+        .75,
+        .035,
+        "sine",
+        musicGain,
+        i*.015
+      );
+
+      tone(
+        f*2,
+        .45,
+        .012,
+        "triangle",
+        musicGain,
+        i*.015
+      );
+    });
   }
 
-  if(step===3||step===7){
-    osc(110,.06,.025,"triangle",musicGain);
+  /* percussion douce */
+
+  if(s===0 || s===4){
+
+    tone(
+      95,
+      .10,
+      .13,
+      "sine",
+      musicGain,
+      0,
+      45
+    );
   }
 
-  musicStep++;
+  if(s===2 || s===6){
+
+    tone(
+      620,
+      .025,
+      .022,
+      "triangle",
+      musicGain
+    );
+  }
+
+  beat++;
 }
+
 
 function startMusic(){
-  if(musicStarted)return;
-  musicStarted=true;
-  musicBeat();
-  musicTimer=setInterval(musicBeat,520);
-}
 
-function stopMusic(){
-  if(musicTimer)clearInterval(musicTimer);
-  musicTimer=null;
-  musicStarted=false;
-}
+  if(musicRunning)return;
 
-function cueSound(power){
-  if(!soundOn)return;
-  osc(240,.05,.5,"triangle",fxGain,0,125);
-  osc(95,.07,.45,"sine",fxGain,.005);
-  noise(.025,.16,1500);
-}
+  musicRunning=true;
 
-let lastHitSound=0;
+  playBeat();
 
-function ballSound(impact){
-  if(!soundOn)return;
-
-  const now=performance.now();
-  if(now-lastHitSound<14)return;
-  lastHitSound=now;
-
-  const v=Math.min(.65,.18+impact*.018);
-  osc(350,.045,v,"triangle",fxGain,0,210);
-  osc(145,.04,v*.45,"sine",fxGain);
-}
-
-function railSound(impact){
-  if(!soundOn)return;
-  const v=Math.min(.48,.13+impact*.015);
-  osc(115,.055,v,"triangle",fxGain,0,70);
-  noise(.025,v*.18,650);
-}
-
-function pocketSound(){
-  if(!soundOn)return;
-  osc(170,.16,.62,"sine",fxGain,0,65);
-  osc(80,.23,.45,"triangle",fxGain,.03,42);
-  noise(.08,.18,450);
-}
-
-musicBtn.onclick=()=>{
-  audioStart();
-  musicOn=!musicOn;
-
-  if(musicOn){
-    startMusic();
-    musicGain.gain.value=.24;
-    musicBtn.textContent="♫ MUSIQUE";
-  }else{
-    stopMusic();
-    musicGain.gain.value=0;
-    musicBtn.textContent="♫ COUPÉE";
-  }
-};
-
-soundBtn.onclick=()=>{
-  audioStart();
-  soundOn=!soundOn;
-  fxGain.gain.value=soundOn?.92:0;
-  soundBtn.textContent=soundOn?"🔊 SON":"🔇 SON";
-};
-
-/* ---------- CANVAS ---------- */
-
-function resize(){
-  const r=canvas.getBoundingClientRect();
-  const d=Math.min(devicePixelRatio||1,2);
-
-  canvas.width=Math.round(r.width*d);
-  canvas.height=Math.round(r.height*d);
-
-  ctx.setTransform(
-    canvas.width/W,0,
-    0,canvas.height/H,
-    0,0
+  musicTimer=setInterval(
+    playBeat,
+    440
   );
 }
 
-addEventListener("resize",resize);
 
-/* ---------- BILLES ---------- */
+function stopMusic(){
+
+  if(musicTimer){
+    clearInterval(musicTimer);
+  }
+
+  musicTimer=null;
+  musicRunning=false;
+}
+
+
+function soundCue(power){
+
+  if(!effectsEnabled)return;
+
+  tone(
+    260,
+    .045,
+    .55,
+    "triangle",
+    effectsGain,
+    0,
+    125
+  );
+
+  tone(
+    95,
+    .075,
+    .38,
+    "sine",
+    effectsGain
+  );
+
+  audioNoise(
+    .028,
+    .13,
+    1500
+  );
+}
+
+
+let lastCollisionSound=0;
+
+function soundBall(impact){
+
+  if(!effectsEnabled)return;
+
+  const now=performance.now();
+
+  if(now-lastCollisionSound<15)return;
+
+  lastCollisionSound=now;
+
+  const volume=
+    Math.min(.55,.12+impact*.015);
+
+  tone(
+    390,
+    .038,
+    volume,
+    "triangle",
+    effectsGain,
+    0,
+    210
+  );
+}
+
+
+function soundRail(impact){
+
+  if(!effectsEnabled)return;
+
+  const volume=
+    Math.min(.45,.12+impact*.012);
+
+  tone(
+    125,
+    .055,
+    volume,
+    "triangle",
+    effectsGain,
+    0,
+    75
+  );
+}
+
+
+function soundPocket(){
+
+  if(!effectsEnabled)return;
+
+  tone(
+    165,
+    .17,
+    .58,
+    "sine",
+    effectsGain,
+    0,
+    60
+  );
+
+  tone(
+    75,
+    .25,
+    .4,
+    "triangle",
+    effectsGain,
+    .02,
+    38
+  );
+}
+
+
+document.getElementById("musicButton").onclick=()=>{
+
+  ensureAudio();
+
+  musicEnabled=!musicEnabled;
+
+  if(musicEnabled){
+
+    musicGain.gain.value=.58;
+    startMusic();
+
+    document.getElementById("musicButton")
+      .textContent="♫ MUSIQUE";
+
+  }else{
+
+    musicGain.gain.value=0;
+    stopMusic();
+
+    document.getElementById("musicButton")
+      .textContent="♫ COUPÉE";
+  }
+};
+
+
+document.getElementById("soundButton").onclick=()=>{
+
+  ensureAudio();
+
+  effectsEnabled=!effectsEnabled;
+
+  effectsGain.gain.value=
+    effectsEnabled ? .9 : 0;
+
+  document.getElementById("soundButton")
+    .textContent=
+      effectsEnabled ? "🔊 SON" : "🔇 SON";
+};
+
+
+/* =========================================================
+   CANVAS
+   ========================================================= */
+
+function resizeCanvas(){
+
+  const rect=canvas.getBoundingClientRect();
+
+  const dpr=
+    Math.min(window.devicePixelRatio || 1,2);
+
+  canvas.width=
+    Math.round(rect.width*dpr);
+
+  canvas.height=
+    Math.round(rect.height*dpr);
+
+  ctx.setTransform(
+    canvas.width/LOGICAL_W,
+    0,
+    0,
+    canvas.height/LOGICAL_H,
+    0,
+    0
+  );
+}
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
+
+
+/* =========================================================
+   BILLES
+   ========================================================= */
+
+const COLORS={
+  1:"#f2d225",
+  2:"#2870d8",
+  3:"#df3037",
+  4:"#8a3ab1",
+  5:"#ef811d",
+  6:"#15905a",
+  7:"#8e2631",
+  8:"#111318",
+
+  9:"#f2d225",
+  10:"#2870d8",
+  11:"#df3037",
+  12:"#8a3ab1",
+  13:"#ef811d",
+  14:"#15905a",
+  15:"#8e2631"
+};
+
 
 class Ball{
-  constructor(n,x,y){
-    this.n=n;
+
+  constructor(number,x,y){
+
+    this.number=number;
+
     this.x=x;
     this.y=y;
+
     this.vx=0;
     this.vy=0;
-    this.dead=false;
+
+    this.pocketed=false;
   }
 
   speed(){
-    return Math.hypot(this.vx,this.vy);
-  }
-
-  update(dt){
-    if(this.dead)return;
-
-    this.x+=this.vx*dt*120;
-    this.y+=this.vy*dt*120;
-
-    const f=Math.pow(friction,dt*120);
-    this.vx*=f;
-    this.vy*=f;
-
-    if(Math.abs(this.vx)<.045)this.vx=0;
-    if(Math.abs(this.vy)<.045)this.vy=0;
+    return Math.hypot(
+      this.vx,
+      this.vy
+    );
   }
 }
 
-function reset(){
+
+function cueBall(){
+  return balls[0];
+}
+
+
+function newGame(){
+
   balls=[];
-  moving=false;
-  pulling=false;
-  pullDistance=0;
-  gameOver=false;
 
-  balls.push(new Ball(0,345,300));
+  ballsMoving=false;
+  charging=false;
+  scratchPending=false;
 
-  const x=790;
-  const dx=R*1.79;
-  const dy=R*2.07;
+  pull=0;
+
+  balls.push(
+    new Ball(
+      0,
+      310,
+      LOGICAL_H/2
+    )
+  );
+
+  /*
+      Triangle réglementaire visuellement propre.
+      La 8 reste au centre du rack.
+  */
 
   const rack=[
     [1],
@@ -543,508 +875,1495 @@ function reset(){
     [6,13,7,14,15]
   ];
 
-  rack.forEach((row,c)=>{
-    row.forEach((n,i)=>{
-      balls.push(new Ball(
-        n,
-        x+c*dx,
-        300+(i-(row.length-1)/2)*dy
-      ));
+  const startX=760;
+
+  const dx=BALL_R*1.78;
+  const dy=BALL_R*2.04;
+
+  rack.forEach((row,column)=>{
+
+    row.forEach((number,index)=>{
+
+      balls.push(
+        new Ball(
+          number,
+          startX+column*dx,
+          LOGICAL_H/2+
+          (index-(row.length-1)/2)*dy
+        )
+      );
     });
   });
 
-  pointer={x:690,y:300};
-  aimingAngle=0;
-  message.textContent="Déplace la souris pour viser";
+  aimAngle=0;
+  lockedAngle=0;
+
+  pull=0;
   updatePower();
+
+  instructions.textContent=
+    "Déplace la souris pour viser • Maintiens et recule la queue • Relâche pour tirer";
 }
 
-document.getElementById("newBtn").onclick=()=>{
-  audioStart();
-  reset();
-};
 
-function white(){
-  return balls[0];
-}
+document.getElementById("newButton")
+  .onclick=()=>{
 
-function stopped(){
-  return balls.every(b=>b.dead||b.speed()<.045);
-}
+    ensureAudio();
+    newGame();
+  };
 
-function pockets(){
+
+/* =========================================================
+   POCHES
+   ========================================================= */
+
+function getPockets(){
+
   return[
-    {x:T.l,y:T.t},
-    {x:(T.l+T.r)/2,y:T.t-4},
-    {x:T.r,y:T.t},
-    {x:T.l,y:T.b},
-    {x:(T.l+T.r)/2,y:T.b+4},
-    {x:T.r,y:T.b}
+    {x:LEFT,y:TOP},
+    {x:(LEFT+RIGHT)/2,y:TOP-2},
+    {x:RIGHT,y:TOP},
+
+    {x:LEFT,y:BOTTOM},
+    {x:(LEFT+RIGHT)/2,y:BOTTOM+2},
+    {x:RIGHT,y:BOTTOM}
   ];
 }
 
-/* ---------- PHYSIQUE ---------- */
 
-function pocketCheck(b){
-  for(const p of pockets()){
-    if(Math.hypot(b.x-p.x,b.y-p.y)<T.pocket){
-      b.dead=true;
-      b.vx=b.vy=0;
-      pocketSound();
+/* =========================================================
+   PHYSIQUE
+   ========================================================= */
 
-      if(b.n===0){
-        setTimeout(()=>{
-          b.dead=false;
-          b.x=345;b.y=300;
-          b.vx=b.vy=0;
-        },450);
+function allStopped(){
+
+  return balls.every(
+    b=>
+      b.pocketed ||
+      b.speed()<.04
+  );
+}
+
+
+function checkPocket(ball){
+
+  for(const p of getPockets()){
+
+    const d=
+      Math.hypot(
+        ball.x-p.x,
+        ball.y-p.y
+      );
+
+    if(d<POCKET_R){
+
+      ball.pocketed=true;
+      ball.vx=0;
+      ball.vy=0;
+
+      soundPocket();
+
+      if(ball.number===0){
+        scratchPending=true;
       }
-      return;
+
+      return true;
     }
   }
+
+  return false;
 }
 
-function cushion(b){
-  let hit=0;
 
-  if(b.x-R<T.l){
-    hit=Math.abs(b.vx);
-    b.x=T.l+R;b.vx=Math.abs(b.vx)*bounce;
-  }
-  if(b.x+R>T.r){
-    hit=Math.max(hit,Math.abs(b.vx));
-    b.x=T.r-R;b.vx=-Math.abs(b.vx)*bounce;
-  }
-  if(b.y-R<T.t){
-    hit=Math.max(hit,Math.abs(b.vy));
-    b.y=T.t+R;b.vy=Math.abs(b.vy)*bounce;
-  }
-  if(b.y+R>T.b){
-    hit=Math.max(hit,Math.abs(b.vy));
-    b.y=T.b-R;b.vy=-Math.abs(b.vy)*bounce;
+function cushions(ball){
+
+  let impact=0;
+
+  if(ball.x-BALL_R<LEFT){
+
+    impact=Math.abs(ball.vx);
+
+    ball.x=LEFT+BALL_R;
+    ball.vx=Math.abs(ball.vx)*.91;
   }
 
-  if(hit>.8)railSound(hit);
+  if(ball.x+BALL_R>RIGHT){
+
+    impact=Math.max(
+      impact,
+      Math.abs(ball.vx)
+    );
+
+    ball.x=RIGHT-BALL_R;
+    ball.vx=-Math.abs(ball.vx)*.91;
+  }
+
+  if(ball.y-BALL_R<TOP){
+
+    impact=Math.max(
+      impact,
+      Math.abs(ball.vy)
+    );
+
+    ball.y=TOP+BALL_R;
+    ball.vy=Math.abs(ball.vy)*.91;
+  }
+
+  if(ball.y+BALL_R>BOTTOM){
+
+    impact=Math.max(
+      impact,
+      Math.abs(ball.vy)
+    );
+
+    ball.y=BOTTOM-BALL_R;
+    ball.vy=-Math.abs(ball.vy)*.91;
+  }
+
+  if(impact>.8){
+    soundRail(impact);
+  }
 }
+
 
 function collide(a,b){
+
   let dx=b.x-a.x;
   let dy=b.y-a.y;
-  let d=Math.hypot(dx,dy);
 
-  if(d===0){d=.01;dx=.01}
-  if(d>=R*2)return;
+  let distance=
+    Math.hypot(dx,dy);
 
-  const nx=dx/d,ny=dy/d;
-  const overlap=R*2-d;
+  if(distance===0){
+
+    dx=.01;
+    distance=.01;
+  }
+
+  const minimum=
+    BALL_R*2;
+
+  if(distance>=minimum)return;
+
+  const nx=dx/distance;
+  const ny=dy/distance;
+
+  /*
+      Séparation avant calcul de collision.
+      Évite les billes qui se superposent.
+  */
+
+  const overlap=
+    minimum-distance;
 
   a.x-=nx*overlap*.5;
   a.y-=ny*overlap*.5;
+
   b.x+=nx*overlap*.5;
   b.y+=ny*overlap*.5;
 
-  const rvx=b.vx-a.vx;
-  const rvy=b.vy-a.vy;
-  const vn=rvx*nx+rvy*ny;
 
-  if(vn>0)return;
+  const rvx=
+    b.vx-a.vx;
 
-  const impulse=-(1+restitution)*vn/2;
+  const rvy=
+    b.vy-a.vy;
+
+  const velocityAlongNormal=
+    rvx*nx+rvy*ny;
+
+  if(velocityAlongNormal>0)return;
+
+  const restitution=.965;
+
+  const impulse=
+    -(1+restitution)*
+    velocityAlongNormal/2;
 
   a.vx-=impulse*nx;
   a.vy-=impulse*ny;
+
   b.vx+=impulse*nx;
   b.vy+=impulse*ny;
 
-  if(Math.abs(vn)>.5)ballSound(Math.abs(vn));
+  if(
+    Math.abs(velocityAlongNormal)>.55
+  ){
+    soundBall(
+      Math.abs(
+        velocityAlongNormal
+      )
+    );
+  }
 }
 
-function physics(dt){
-  balls.forEach(b=>{
-    b.update(dt);
-    if(!b.dead){
-      pocketCheck(b);
-      if(!b.dead)cushion(b);
+
+function physicsStep(dt){
+
+  const frameScale=
+    dt*120;
+
+  for(const b of balls){
+
+    if(b.pocketed)continue;
+
+    b.x+=b.vx*frameScale;
+    b.y+=b.vy*frameScale;
+
+    const friction=
+      Math.pow(.991,frameScale);
+
+    b.vx*=friction;
+    b.vy*=friction;
+
+    if(Math.abs(b.vx)<.04){
+      b.vx=0;
     }
-  });
+
+    if(Math.abs(b.vy)<.04){
+      b.vy=0;
+    }
+
+    if(!checkPocket(b)){
+      cushions(b);
+    }
+  }
+
 
   for(let i=0;i<balls.length;i++){
-    if(balls[i].dead)continue;
 
-    for(let j=i+1;j<balls.length;j++){
-      if(!balls[j].dead)collide(balls[i],balls[j]);
+    const a=balls[i];
+
+    if(a.pocketed)continue;
+
+    for(
+      let j=i+1;
+      j<balls.length;
+      j++
+    ){
+
+      const b=balls[j];
+
+      if(b.pocketed)continue;
+
+      collide(a,b);
     }
   }
 
-  if(moving&&stopped()){
-    moving=false;
-    message.textContent="À toi de jouer";
+
+  if(
+    ballsMoving &&
+    allStopped()
+  ){
+
+    ballsMoving=false;
+
+    if(scratchPending){
+
+      const white=cueBall();
+
+      white.pocketed=false;
+      white.x=310;
+      white.y=LOGICAL_H/2;
+
+      white.vx=0;
+      white.vy=0;
+
+      scratchPending=false;
+    }
+
+    instructions.textContent=
+      "Déplace la souris pour viser";
   }
 }
 
-/* ---------- CONTRÔLE QUEUE ---------- */
 
-function pos(e){
-  const r=canvas.getBoundingClientRect();
+/* =========================================================
+   SOURIS
+   ========================================================= */
+
+function mousePosition(event){
+
+  const rect=
+    canvas.getBoundingClientRect();
+
   return{
-    x:(e.clientX-r.left)/r.width*W,
-    y:(e.clientY-r.top)/r.height*H
+    x:
+      (event.clientX-rect.left)/
+      rect.width*LOGICAL_W,
+
+    y:
+      (event.clientY-rect.top)/
+      rect.height*LOGICAL_H
   };
 }
 
-canvas.addEventListener("pointermove",e=>{
-  if(moving||gameOver)return;
 
-  const p=pos(e);
+canvas.addEventListener(
+  "pointermove",
+  event=>{
 
-  if(!pulling){
-    pointer=p;
+    if(
+      ballsMoving ||
+      !allStopped()
+    )return;
 
-    const w=white();
-    aimingAngle=Math.atan2(p.y-w.y,p.x-w.x);
-  }else{
-    /*
-      Pendant le recul, l'angle est verrouillé.
-      Seule la distance du mouvement opposé à la visée
-      contrôle la puissance.
-    */
-    const dx=p.x-pullStart.x;
-    const dy=p.y-pullStart.y;
+    const p=
+      mousePosition(event);
 
-    const backwards=
-      -(dx*Math.cos(aimingAngle)+
-        dy*Math.sin(aimingAngle));
+    mouse=p;
 
-    pullDistance=Math.max(0,Math.min(170,backwards));
+    const white=cueBall();
+
+    if(!charging){
+
+      /*
+         La queue tourne autour de la blanche.
+      */
+
+      aimAngle=
+        Math.atan2(
+          p.y-white.y,
+          p.x-white.x
+        );
+
+    }else{
+
+      /*
+         Une fois le recul commencé,
+         l'angle est VERROUILLÉ.
+
+         Le mouvement arrière de la souris
+         agit directement sur le recul
+         visuel de la queue.
+      */
+
+      const mx=
+        p.x-dragStart.x;
+
+      const my=
+        p.y-dragStart.y;
+
+      const backwardsX=
+        -Math.cos(lockedAngle);
+
+      const backwardsY=
+        -Math.sin(lockedAngle);
+
+      const projected=
+        mx*backwardsX+
+        my*backwardsY;
+
+      pull=
+        Math.max(
+          0,
+          Math.min(
+            MAX_PULL,
+            projected
+          )
+        );
+
+      updatePower();
+    }
+  }
+);
+
+
+canvas.addEventListener(
+  "pointerdown",
+  event=>{
+
+    ensureAudio();
+
+    if(
+      ballsMoving ||
+      !allStopped()
+    )return;
+
+    charging=true;
+
+    lockedAngle=aimAngle;
+
+    dragStart=
+      mousePosition(event);
+
+    pull=0;
+
+    updatePower();
+
+    canvas.setPointerCapture(
+      event.pointerId
+    );
+
+    instructions.textContent=
+      "Maintiens le clic et recule la queue";
+  }
+);
+
+
+canvas.addEventListener(
+  "pointerup",
+  event=>{
+
+    if(!charging)return;
+
+    charging=false;
+
+    if(pull<8){
+
+      pull=0;
+      updatePower();
+
+      instructions.textContent=
+        "Recule la queue davantage pour tirer";
+
+      return;
+    }
+
+    fireShot();
+  }
+);
+
+
+canvas.addEventListener(
+  "pointercancel",
+  ()=>{
+
+    charging=false;
+    pull=0;
     updatePower();
   }
-});
+);
 
-canvas.addEventListener("pointerdown",e=>{
-  audioStart();
-
-  if(moving||gameOver||!stopped())return;
-
-  pulling=true;
-  pullStart=pos(e);
-  pullDistance=0;
-  canvas.setPointerCapture(e.pointerId);
-
-  message.textContent="Recule la queue puis relâche";
-});
-
-canvas.addEventListener("pointerup",e=>{
-  if(!pulling)return;
-
-  pulling=false;
-
-  if(pullDistance<7){
-    pullDistance=0;
-    updatePower();
-    message.textContent="Recule davantage la queue";
-    return;
-  }
-
-  shoot();
-});
 
 function updatePower(){
-  const percent=Math.round(pullDistance/170*100);
-  meter.style.width=percent+"%";
-  powerText.textContent=percent+" %";
+
+  const percentage=
+    Math.round(
+      pull/MAX_PULL*100
+    );
+
+  powerFill.style.width=
+    percentage+"%";
+
+  powerText.textContent=
+    percentage+" %";
 }
 
-function shoot(){
-  const b=white();
-  const p=pullDistance/170;
 
-  const force=7+p*29;
+function fireShot(){
 
-  b.vx=Math.cos(aimingAngle)*force;
-  b.vy=Math.sin(aimingAngle)*force;
+  const white=cueBall();
 
-  cueSound(p*100);
+  const power=
+    pull/MAX_PULL;
 
-  moving=true;
-  pullDistance=0;
+  /*
+     Puissance du tir.
+  */
+
+  const velocity=
+    7+power*30;
+
+  white.vx=
+    Math.cos(lockedAngle)*
+    velocity;
+
+  white.vy=
+    Math.sin(lockedAngle)*
+    velocity;
+
+  soundCue(power);
+
+  aimAngle=lockedAngle;
+
+  pull=0;
   updatePower();
 
-  message.textContent="Billes en mouvement…";
+  ballsMoving=true;
+
+  instructions.textContent=
+    "Billes en mouvement…";
 }
 
-/* ---------- TABLE ---------- */
 
-function rr(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.roundRect(x,y,w,h,r);
-}
+/* =========================================================
+   DESSIN DE LA TABLE
+   Rails volontairement DROITS.
+   Aucun bord ondulé.
+   ========================================================= */
 
-function table(){
-  ctx.clearRect(0,0,W,H);
+function drawTable(){
 
-  ctx.save();
-  ctx.shadowColor="rgba(0,0,0,.9)";
-  ctx.shadowBlur=30;
-  ctx.shadowOffsetY=16;
+  ctx.clearRect(
+    0,0,
+    LOGICAL_W,
+    LOGICAL_H
+  );
 
-  rr(42,25,1116,550,38);
+  /*
+     tapis
+  */
 
-  const wood=ctx.createLinearGradient(0,25,0,575);
-  wood.addColorStop(0,"#a96a31");
-  wood.addColorStop(.16,"#4a210c");
-  wood.addColorStop(.48,"#8d4d20");
-  wood.addColorStop(.78,"#3a1808");
-  wood.addColorStop(1,"#9a5928");
+  const felt=
+    ctx.createRadialGradient(
+      540,220,20,
+      550,275,620
+    );
 
-  ctx.fillStyle=wood;
-  ctx.fill();
-  ctx.restore();
+  felt.addColorStop(
+    0,
+    "#18a973"
+  );
 
-  rr(73,56,1054,488,27);
-  ctx.fillStyle="#12171a";
-  ctx.fill();
+  felt.addColorStop(
+    .55,
+    "#07865c"
+  );
 
-  const felt=ctx.createRadialGradient(600,270,50,600,300,600);
-  felt.addColorStop(0,"#16a875");
-  felt.addColorStop(.55,"#07855c");
-  felt.addColorStop(1,"#034b35");
+  felt.addColorStop(
+    1,
+    "#03563b"
+  );
 
-  rr(T.l-R,T.t-R,T.r-T.l+R*2,T.b-T.t+R*2,16);
   ctx.fillStyle=felt;
-  ctx.fill();
 
-  /* rails */
-  ctx.strokeStyle="rgba(0,0,0,.45)";
-  ctx.lineWidth=5;
-  rr(T.l-20,T.t-20,T.r-T.l+40,T.b-T.t+40,18);
-  ctx.stroke();
+  ctx.fillRect(
+    LEFT,
+    TOP,
+    RIGHT-LEFT,
+    BOTTOM-TOP
+  );
 
-  /* repères */
-  ctx.fillStyle="rgba(240,230,205,.78)";
+
+  /*
+     bandes intérieures :
+     4 rectangles parfaitement droits
+  */
+
+  const railGradient=
+    ctx.createLinearGradient(
+      0,TOP-28,0,TOP
+    );
+
+  railGradient.addColorStop(
+    0,
+    "#116f4e"
+  );
+
+  railGradient.addColorStop(
+    1,
+    "#064b35"
+  );
+
+  ctx.fillStyle=railGradient;
+
+  ctx.fillRect(
+    LEFT,
+    TOP-20,
+    RIGHT-LEFT,
+    20
+  );
+
+  ctx.fillRect(
+    LEFT,
+    BOTTOM,
+    RIGHT-LEFT,
+    20
+  );
+
+  ctx.fillRect(
+    LEFT-20,
+    TOP,
+    20,
+    BOTTOM-TOP
+  );
+
+  ctx.fillRect(
+    RIGHT,
+    TOP,
+    20,
+    BOTTOM-TOP
+  );
+
+
+  /*
+     repères losanges
+  */
+
+  ctx.fillStyle=
+    "rgba(235,225,198,.8)";
 
   for(let i=1;i<8;i++){
-    const x=T.l+(T.r-T.l)*i/8;
-    diamond(x,68);
-    diamond(x,532);
+
+    const x=
+      LEFT+
+      (RIGHT-LEFT)*i/8;
+
+    drawDiamond(
+      x,
+      TOP-30
+    );
+
+    drawDiamond(
+      x,
+      BOTTOM+30
+    );
   }
 
-  for(const p of pockets()){
-    const g=ctx.createRadialGradient(p.x-5,p.y-5,2,p.x,p.y,T.pocket+8);
-    g.addColorStop(0,"#000");
-    g.addColorStop(.7,"#010101");
-    g.addColorStop(1,"#282828");
+
+  for(let i=1;i<4;i++){
+
+    const y=
+      TOP+
+      (BOTTOM-TOP)*i/4;
+
+    drawDiamond(
+      LEFT-30,
+      y
+    );
+
+    drawDiamond(
+      RIGHT+30,
+      y
+    );
+  }
+
+
+  /*
+     poches
+  */
+
+  for(const p of getPockets()){
+
+    ctx.save();
+
+    ctx.shadowColor=
+      "rgba(0,0,0,.9)";
+
+    ctx.shadowBlur=14;
+
+    const pg=
+      ctx.createRadialGradient(
+        p.x-5,
+        p.y-6,
+        2,
+        p.x,
+        p.y,
+        POCKET_R+7
+      );
+
+    pg.addColorStop(
+      0,
+      "#000"
+    );
+
+    pg.addColorStop(
+      .75,
+      "#000"
+    );
+
+    pg.addColorStop(
+      1,
+      "#1c211f"
+    );
 
     ctx.beginPath();
-    ctx.arc(p.x,p.y,T.pocket+7,0,Math.PI*2);
-    ctx.fillStyle=g;
+
+    ctx.arc(
+      p.x,
+      p.y,
+      POCKET_R+5,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fillStyle=pg;
     ctx.fill();
+
+    ctx.restore();
   }
 }
 
-function diamond(x,y){
+
+function drawDiamond(x,y){
+
   ctx.save();
+
   ctx.translate(x,y);
   ctx.rotate(Math.PI/4);
-  ctx.fillRect(-3,-3,6,6);
+
+  ctx.fillRect(
+    -4,-4,
+    8,8
+  );
+
   ctx.restore();
 }
 
-/* ---------- RENDU BILLES ---------- */
 
-function drawBall(b){
-  if(b.dead)return;
+/* =========================================================
+   BILLES BRILLANTES
+   ========================================================= */
+
+function drawBall(ball){
+
+  if(ball.pocketed)return;
 
   ctx.save();
 
-  ctx.shadowColor="rgba(0,0,0,.65)";
+  ctx.shadowColor=
+    "rgba(0,0,0,.65)";
+
   ctx.shadowBlur=10;
+
   ctx.shadowOffsetX=5;
   ctx.shadowOffsetY=7;
 
-  const base=b.n===0?"#f7f5ed":colours[b.n];
 
-  const g=ctx.createRadialGradient(
-    b.x-R*.43,b.y-R*.48,1,
-    b.x,b.y,R*1.15
+  const base=
+    ball.number===0
+      ? "#f5f6f3"
+      : COLORS[ball.number];
+
+
+  const gradient=
+    ctx.createRadialGradient(
+      ball.x-BALL_R*.45,
+      ball.y-BALL_R*.5,
+      1,
+
+      ball.x,
+      ball.y,
+      BALL_R*1.15
+    );
+
+  gradient.addColorStop(
+    0,
+    "#ffffff"
   );
 
-  g.addColorStop(0,"#fff");
-  g.addColorStop(.18,base);
-  g.addColorStop(.7,base);
-  g.addColorStop(1,"#05070a");
+  gradient.addColorStop(
+    .2,
+    base
+  );
+
+  gradient.addColorStop(
+    .72,
+    base
+  );
+
+  gradient.addColorStop(
+    1,
+    "#05070a"
+  );
+
 
   ctx.beginPath();
-  ctx.arc(b.x,b.y,R,0,Math.PI*2);
-  ctx.fillStyle=g;
+
+  ctx.arc(
+    ball.x,
+    ball.y,
+    BALL_R,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fillStyle=gradient;
   ctx.fill();
 
   ctx.shadowColor="transparent";
 
-  if(b.n>=9){
+
+  /*
+     bandes blanches
+     billes rayées
+  */
+
+  if(ball.number>=9){
+
     ctx.save();
+
     ctx.beginPath();
-    ctx.arc(b.x,b.y,R-.7,0,Math.PI*2);
+
+    ctx.arc(
+      ball.x,
+      ball.y,
+      BALL_R-.5,
+      0,
+      Math.PI*2
+    );
+
     ctx.clip();
 
-    ctx.fillStyle="#f7f4ea";
-    ctx.fillRect(b.x-R,b.y-7,R*2,14);
+    ctx.fillStyle="#f6f4ed";
+
+    ctx.fillRect(
+      ball.x-BALL_R,
+      ball.y-7,
+      BALL_R*2,
+      14
+    );
+
     ctx.restore();
   }
 
-  if(b.n!==0){
+
+  /*
+     numéro
+  */
+
+  if(ball.number!==0){
+
     ctx.beginPath();
-    ctx.arc(b.x,b.y,8.2,0,Math.PI*2);
-    ctx.fillStyle="#faf8ef";
+
+    ctx.arc(
+      ball.x,
+      ball.y,
+      8.5,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fillStyle="#faf9f3";
     ctx.fill();
 
     ctx.fillStyle="#111";
-    ctx.font="bold 10px Arial";
+
+    ctx.font=
+      "bold 10px Arial";
+
     ctx.textAlign="center";
     ctx.textBaseline="middle";
-    ctx.fillText(b.n,b.x,b.y+.3);
+
+    ctx.fillText(
+      ball.number,
+      ball.x,
+      ball.y+.3
+    );
   }
 
+
+  /*
+     reflet brillant
+  */
+
   ctx.beginPath();
+
   ctx.ellipse(
-    b.x-R*.38,b.y-R*.45,
-    R*.27,R*.15,-.55,0,Math.PI*2
+    ball.x-BALL_R*.38,
+    ball.y-BALL_R*.47,
+    BALL_R*.28,
+    BALL_R*.14,
+    -.55,
+    0,
+    Math.PI*2
   );
-  ctx.fillStyle="rgba(255,255,255,.65)";
+
+  ctx.fillStyle=
+    "rgba(255,255,255,.72)";
+
   ctx.fill();
 
   ctx.restore();
 }
 
-/* ---------- VISÉE ---------- */
 
-function aim(){
-  if(moving||gameOver)return;
+/* =========================================================
+   CALCUL DU GUIDE DE VISÉE
+   ========================================================= */
 
-  const b=white();
-  if(b.dead)return;
+function calculateAim(){
 
-  const dx=Math.cos(aimingAngle);
-  const dy=Math.sin(aimingAngle);
+  const white=cueBall();
 
-  let distance=1000;
+  if(
+    white.pocketed ||
+    ballsMoving
+  )return null;
 
-  balls.forEach(o=>{
-    if(o===b||o.dead)return;
+  const angle=
+    charging
+      ? lockedAngle
+      : aimAngle;
 
-    const ox=o.x-b.x;
-    const oy=o.y-b.y;
-    const proj=ox*dx+oy*dy;
+  const dx=Math.cos(angle);
+  const dy=Math.sin(angle);
 
-    if(proj<=0)return;
+  let closest=null;
+  let closestDistance=Infinity;
 
-    const perp=Math.abs(ox*dy-oy*dx);
 
-    if(perp<R*2){
-      const offset=Math.sqrt(Math.max(0,(R*2)**2-perp**2));
-      distance=Math.min(distance,proj-offset);
+  /*
+     Recherche de la première bille
+     que la blanche toucherait.
+  */
+
+  for(const target of balls){
+
+    if(
+      target===white ||
+      target.pocketed
+    )continue;
+
+    const ox=
+      target.x-white.x;
+
+    const oy=
+      target.y-white.y;
+
+    const projection=
+      ox*dx+oy*dy;
+
+    if(projection<=0)continue;
+
+    const perpendicularSq=
+      ox*ox+
+      oy*oy-
+      projection*projection;
+
+    const collisionRadius=
+      BALL_R*2;
+
+    if(
+      perpendicularSq >
+      collisionRadius*
+      collisionRadius
+    )continue;
+
+    const offset=
+      Math.sqrt(
+        collisionRadius*
+        collisionRadius-
+        perpendicularSq
+      );
+
+    const distance=
+      projection-offset;
+
+    if(
+      distance>0 &&
+      distance<closestDistance
+    ){
+
+      closestDistance=distance;
+      closest=target;
     }
-  });
-
-  ctx.save();
-  ctx.setLineDash([8,7]);
-  ctx.strokeStyle="rgba(255,255,255,.78)";
-  ctx.lineWidth=1.7;
-
-  ctx.beginPath();
-  ctx.moveTo(b.x,b.y);
-  ctx.lineTo(b.x+dx*Math.min(distance,850),b.y+dy*Math.min(distance,850));
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-/* ---------- QUEUE MANUELLE ---------- */
-
-function cue(){
-  if(moving||gameOver)return;
-
-  const b=white();
-  if(b.dead)return;
-
-  const dx=Math.cos(aimingAngle);
-  const dy=Math.sin(aimingAngle);
-
-  const gap=R+13+pullDistance;
-  const len=350;
-
-  const x1=b.x-dx*gap;
-  const y1=b.y-dy*gap;
-  const x2=b.x-dx*(gap+len);
-  const y2=b.y-dy*(gap+len);
-
-  ctx.save();
-  ctx.lineCap="round";
-
-  ctx.strokeStyle="rgba(0,0,0,.55)";
-  ctx.lineWidth=12;
-  ctx.beginPath();
-  ctx.moveTo(x1+4,y1+6);
-  ctx.lineTo(x2+4,y2+6);
-  ctx.stroke();
-
-  const g=ctx.createLinearGradient(x1,y1,x2,y2);
-  g.addColorStop(0,"#f5e1b5");
-  g.addColorStop(.38,"#d99b4f");
-  g.addColorStop(.72,"#7c3618");
-  g.addColorStop(1,"#291007");
-
-  ctx.strokeStyle=g;
-  ctx.lineWidth=8;
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x2,y2);
-  ctx.stroke();
-
-  ctx.strokeStyle="#54c8ff";
-  ctx.lineWidth=5;
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x1-dx*8,y1-dy*8);
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-function render(){
-  table();
-  aim();
-
-  balls.forEach(drawBall);
-  cue();
-}
-
-/* ---------- BOUCLE ---------- */
-
-function loop(now){
-  const dt=Math.min(.032,(now-last)/1000);
-  last=now;
-  acc+=dt;
-
-  while(acc>=STEP){
-    physics(STEP);
-    acc-=STEP;
   }
 
-  render();
-  requestAnimationFrame(loop);
+
+  /*
+     Si aucune bille n'est visée :
+     le guide s'arrête sur une bande.
+  */
+
+  if(!closest){
+
+    let wallDistance=Infinity;
+
+    if(dx>0){
+      wallDistance=Math.min(
+        wallDistance,
+        (RIGHT-BALL_R-white.x)/dx
+      );
+    }
+
+    if(dx<0){
+      wallDistance=Math.min(
+        wallDistance,
+        (LEFT+BALL_R-white.x)/dx
+      );
+    }
+
+    if(dy>0){
+      wallDistance=Math.min(
+        wallDistance,
+        (BOTTOM-BALL_R-white.y)/dy
+      );
+    }
+
+    if(dy<0){
+      wallDistance=Math.min(
+        wallDistance,
+        (TOP+BALL_R-white.y)/dy
+      );
+    }
+
+    return{
+      target:null,
+
+      ghostX:
+        white.x+
+        dx*wallDistance,
+
+      ghostY:
+        white.y+
+        dy*wallDistance,
+
+      dx,dy
+    };
+  }
+
+
+  return{
+    target:closest,
+
+    ghostX:
+      white.x+
+      dx*closestDistance,
+
+    ghostY:
+      white.y+
+      dy*closestDistance,
+
+    dx,dy
+  };
 }
 
-resize();
-reset();
-requestAnimationFrame(loop);
+
+/* =========================================================
+   GUIDE BLANC TYPE BILLARD
+   ========================================================= */
+
+function drawAimGuide(){
+
+  if(
+    ballsMoving ||
+    !allStopped()
+  )return;
+
+  const white=cueBall();
+
+  if(white.pocketed)return;
+
+  const result=
+    calculateAim();
+
+  if(!result)return;
+
+
+  ctx.save();
+
+  /*
+     LIGNE BLANCHE PRINCIPALE
+     de la blanche vers le point d'impact.
+  */
+
+  ctx.strokeStyle=
+    "rgba(255,255,255,.94)";
+
+  ctx.lineWidth=2.2;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    white.x,
+    white.y
+  );
+
+  ctx.lineTo(
+    result.ghostX,
+    result.ghostY
+  );
+
+  ctx.stroke();
+
+
+  /*
+     Cercle fantôme :
+     position de la bille blanche
+     au moment de l'impact.
+  */
+
+  ctx.beginPath();
+
+  ctx.arc(
+    result.ghostX,
+    result.ghostY,
+    BALL_R,
+    0,
+    Math.PI*2
+  );
+
+  ctx.strokeStyle="#fff";
+  ctx.lineWidth=2.6;
+  ctx.stroke();
+
+
+  /*
+     petit point central
+  */
+
+  ctx.beginPath();
+
+  ctx.arc(
+    result.ghostX,
+    result.ghostY,
+    3.3,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fillStyle="#fff";
+  ctx.fill();
+
+
+  /*
+     Si une bille est touchée :
+     trajectoire prévue de la bille cible.
+  */
+
+  if(result.target){
+
+    const target=result.target;
+
+    let tx=
+      target.x-result.ghostX;
+
+    let ty=
+      target.y-result.ghostY;
+
+    const length=
+      Math.hypot(tx,ty);
+
+    if(length>0){
+
+      tx/=length;
+      ty/=length;
+
+      const predictionLength=100;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        target.x,
+        target.y
+      );
+
+      ctx.lineTo(
+        target.x+
+        tx*predictionLength,
+
+        target.y+
+        ty*predictionLength
+      );
+
+      ctx.strokeStyle=
+        "rgba(255,255,255,.92)";
+
+      ctx.lineWidth=2;
+      ctx.stroke();
+
+
+      /*
+         petite flèche de direction
+      */
+
+      const endX=
+        target.x+
+        tx*predictionLength;
+
+      const endY=
+        target.y+
+        ty*predictionLength;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        endX,
+        endY,
+        4,
+        0,
+        Math.PI*2
+      );
+
+      ctx.fillStyle="#fff";
+      ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+
+
+/* =========================================================
+   QUEUE
+   ========================================================= */
+
+function drawCue(){
+
+  if(
+    ballsMoving ||
+    !allStopped()
+  )return;
+
+  const white=cueBall();
+
+  if(white.pocketed)return;
+
+  const angle=
+    charging
+      ? lockedAngle
+      : aimAngle;
+
+  const dx=Math.cos(angle);
+  const dy=Math.sin(angle);
+
+
+  /*
+     La queue est TOUJOURS dans l'axe
+     opposé à la trajectoire du tir.
+
+     Lorsqu'on tire la souris en arrière,
+     "pull" augmente et la queue recule
+     visiblement.
+  */
+
+  const baseGap=
+    BALL_R+9;
+
+  const gap=
+    baseGap+pull;
+
+  const cueLength=360;
+
+  const tipX=
+    white.x-
+    dx*gap;
+
+  const tipY=
+    white.y-
+    dy*gap;
+
+  const backX=
+    white.x-
+    dx*(gap+cueLength);
+
+  const backY=
+    white.y-
+    dy*(gap+cueLength);
+
+
+  ctx.save();
+
+  ctx.lineCap="round";
+
+
+  /*
+     ombre
+  */
+
+  ctx.strokeStyle=
+    "rgba(0,0,0,.55)";
+
+  ctx.lineWidth=11;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    tipX+4,
+    tipY+5
+  );
+
+  ctx.lineTo(
+    backX+4,
+    backY+5
+  );
+
+  ctx.stroke();
+
+
+  /*
+     bois
+  */
+
+  const wood=
+    ctx.createLinearGradient(
+      tipX,
+      tipY,
+      backX,
+      backY
+    );
+
+  wood.addColorStop(
+    0,
+    "#f0d7a4"
+  );
+
+  wood.addColorStop(
+    .35,
+    "#d69b55"
+  );
+
+  wood.addColorStop(
+    .7,
+    "#81401f"
+  );
+
+  wood.addColorStop(
+    1,
+    "#281008"
+  );
+
+  ctx.strokeStyle=wood;
+  ctx.lineWidth=8;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    tipX,
+    tipY
+  );
+
+  ctx.lineTo(
+    backX,
+    backY
+  );
+
+  ctx.stroke();
+
+
+  /*
+     embout bleu
+  */
+
+  ctx.strokeStyle="#36bfff";
+  ctx.lineWidth=6;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    tipX,
+    tipY
+  );
+
+  ctx.lineTo(
+    tipX-dx*7,
+    tipY-dy*7
+  );
+
+  ctx.stroke();
+
+
+  /*
+     décoration arrière
+  */
+
+  ctx.strokeStyle="#d8ad5b";
+  ctx.lineWidth=9;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    backX+dx*42,
+    backY+dy*42
+  );
+
+  ctx.lineTo(
+    backX+dx*67,
+    backY+dy*67
+  );
+
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+
+/* =========================================================
+   RENDU
+   ========================================================= */
+
+function render(){
+
+  drawTable();
+
+  /*
+     Guide sous les billes :
+     même logique visuelle que les
+     jeux de billard modernes.
+  */
+
+  drawAimGuide();
+
+  for(const ball of balls){
+    drawBall(ball);
+  }
+
+  /*
+     Queue au-dessus du tapis.
+  */
+
+  drawCue();
+}
+
+
+/* =========================================================
+   BOUCLE STABLE
+   ========================================================= */
+
+function gameLoop(now){
+
+  const delta=
+    Math.min(
+      .03,
+      (now-lastTime)/1000
+    );
+
+  lastTime=now;
+
+  accumulator+=delta;
+
+
+  while(
+    accumulator>=FIXED_STEP
+  ){
+
+    physicsStep(
+      FIXED_STEP
+    );
+
+    accumulator-=
+      FIXED_STEP;
+  }
+
+
+  render();
+
+  requestAnimationFrame(
+    gameLoop
+  );
+}
+
+
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+
+resizeCanvas();
+newGame();
+
+requestAnimationFrame(
+  gameLoop
+);
+
 
 /*
-  Les navigateurs bloquent la lecture automatique avec son.
-  La première interaction sur le jeu initialise donc
-  musique + effets audio.
+   Chrome bloque la musique automatique
+   avant la première interaction.
+
+   Dès le premier clic dans la page,
+   le moteur audio démarre.
 */
-document.addEventListener("pointerdown",audioStart,{once:true});
+
+document.addEventListener(
+  "pointerdown",
+  ensureAudio,
+  {once:true}
+);
 
 </script>
+
 </body>
 </html>
